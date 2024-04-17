@@ -30,6 +30,6 @@ func init() {
 		panic(err)
 	}
 	// defer dbClient.Close()
-	fmt.Println((DbClient))
+	// fmt.Println((DbClient))
 	fmt.Println("Successfully connected!")
 }
