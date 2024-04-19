@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"time"
 
 	_ "github.com/lib/pq"
+	"github.com/sabrina-djebbar/spelling-app-backend/repo"
 )
 
 type CreateUserRequest struct {
@@ -36,13 +38,19 @@ func main() {
 	if err = db.Ping(); err != nil {
 		log.Fatal(err)
 	}
-	// create tables
-	createCredentialsTable(db)
-	createUserTable(db)
+	userReq := repo.CreateUserParams{"user", time.Now(), "1234"}
 
-	userReq := CreateUserRequest{"user", "password", "1234", time.Now()}
-	user := createUser(db, userReq)
-	fmt.Print("user ", user)
+	ctx := context.Background()
+	queries := repo.New(*db)
+	queries.CreateUser(ctx, userReq)
+	/*
+		// create tables
+		createCredentialsTable(db)
+		createUserTable(db)
+
+		userReq := CreateUserRequest{"user", "password", "1234", time.Now()}
+		user := createUser(db, userReq)
+		fmt.Print("user ", user)*/
 }
 
 func createCredentialsTable(db *sql.DB) {
@@ -79,7 +87,7 @@ func createUserTable(db *sql.DB) {
 
 func createUser(db *sql.DB, req CreateUserRequest) int {
 	sqlUserQuery := `INSERT INTO users (username, date_of_birth, parent_code) VALUES ($1, $2, $3) RETURNING id, username`
-	sqlCredentialQuery := `INSERT INTO credentials (user_id, password) VALUES($1,crypt($2,'crypt-des'));`
+	sqlCredentialQuery := `INSERT INTO credentials (user_id, password) VALUES($1,crypt($2,'crypt-des')));`
 	var (
 		id       int
 		username string
