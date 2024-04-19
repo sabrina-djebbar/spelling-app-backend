@@ -24,6 +24,7 @@ type User struct {
 	DateOfBirth time.Time
 }
 
+// https://www.youtube.com/watch?v=x_N2VjGQKr4
 func main() {
 	connStr := "postgres://postgres:secret@localhost:5432/spelling-app?sslmode=disable"
 
