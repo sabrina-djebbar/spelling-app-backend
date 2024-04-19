@@ -6,16 +6,18 @@ package repo
 
 import (
 	"database/sql"
+
+	"github.com/google/uuid"
 )
 
 type Credential struct {
-	ID       string
-	UserID   string
+	ID       uuid.UUID
+	UserID   uuid.UUID
 	Password string
 }
 
 type User struct {
-	ID          string
+	ID          uuid.UUID
 	Username    string
 	ParentCode  string
 	DateOfBirth sql.NullTime

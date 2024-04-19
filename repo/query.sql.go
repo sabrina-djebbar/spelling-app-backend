@@ -7,43 +7,43 @@ package repo
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
+	"database/sql"
 )
 
 const createCredentials = `-- name: CreateCredentials :exec
-INSERT INTO credentials (user_id, password) VALUES($1,crypt($2,'crypt-des'))
+INSERT INTO credentials (id, user_id, password) VALUES($1,$2,crypt($3,'crypt-des'))
 `
 
 type CreateCredentialsParams struct {
-	UserID pgtype.Int4
+	ID     string
+	UserID string
 	Crypt  string
 }
 
 func (q *Queries) CreateCredentials(ctx context.Context, arg CreateCredentialsParams) error {
-	_, err := q.db.Exec(ctx, createCredentials, arg.UserID, arg.Crypt)
+	_, err := q.db.ExecContext(ctx, createCredentials, arg.ID, arg.UserID, arg.Crypt)
 	return err
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (username, date_of_birth, parent_code) VALUES ($1, $2, $3) RETURNING id, username, parent_code, date_of_birth, created
+INSERT INTO users (id, username, date_of_birth, parent_code) VALUES ($1, $2, $3, $4) RETURNING id
 `
 
 type CreateUserParams struct {
+	ID          string
 	Username    string
-	DateOfBirth pgtype.Date
-	ParentCode  pgtype.Text
+	DateOfBirth sql.NullTime
+	ParentCode  string
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.DateOfBirth, arg.ParentCode)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Username,
-		&i.ParentCode,
-		&i.DateOfBirth,
-		&i.Created,
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, createUser,
+		arg.ID,
+		arg.Username,
+		arg.DateOfBirth,
+		arg.ParentCode,
 	)
-	return i, err
+	var id string
+	err := row.Scan(&id)
+	return id, err
 }

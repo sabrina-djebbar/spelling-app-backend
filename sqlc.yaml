@@ -1,10 +1,9 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "repo/query.sql"
-    schema: "repo/schema.sql"
+    queries: "query.sql"
+    schema: "schema.sql"
     gen:
       go:
         package: "repo"
         out: "repo"
-        sql_package: "pgx/v5"
