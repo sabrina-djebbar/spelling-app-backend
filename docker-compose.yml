@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: user_db
+      POSTGRES_DB: user
     volumes:
       - ./pg_data:/var/lib/postgresql/data
       - ./init-local-db.sql:/docker-entrypoint-initdb.d/init-local-db.sql
@@ -30,4 +30,4 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: "postgres://user:password@postgres/user_db?sslmode=disable"
+      DATABASE_URL: "postgres://user:password@postgres/user?sslmode=disable"

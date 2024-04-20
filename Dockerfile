@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the user
-RUN go build -o main init.go
+RUN go build -o main main.go
 
 # Use a minimal base image for the final container
 FROM alpine:latest

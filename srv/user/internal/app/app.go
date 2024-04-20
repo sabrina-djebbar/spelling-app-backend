@@ -1,20 +1,46 @@
 package app
 
+import (
+	"context"
+	repo "github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/pkg/client"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/pkg/models"
+)
+
 type App interface {
 	GetUser(ctx context.Context, userID string) (*models.User, error)
-	CreateUser(ctx context.Context, req CreateUserRequest) (*models.User, error)
-	EditUser(ctx context.Context, req EditUserRequest) (*models.User, error)
-	EditParentDetails(ctx context.Context, req EditParentDetailsRequest) (*models.User, error)
-	Login(ctx context.Context, req LoginRequest) (*models.User, error)
-	Logout(ctx context.Context, req LogoutRequest) error
+	CreateUser(ctx context.Context, req client.CreateUserRequest) (*models.User, error)
+	EditUser(ctx context.Context, req client.EditUserRequest) (*models.User, error)
+	EditParentDetails(ctx context.Context, req client.EditParentDetailsRequest) (*models.User, error)
+	Login(ctx context.Context, req client.LoginRequest) (*models.User, error)
 }
 
 type app struct {
-	repository repo.UserRepository
+	repository repo.Repository
+}
+
+func (a *app) GetUser(ctx context.Context, userID string) (*models.User, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a *app) EditUser(ctx context.Context, req client.EditUserRequest) (*models.User, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a *app) EditParentDetails(ctx context.Context, req client.EditParentDetailsRequest) (*models.User, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a *app) Login(ctx context.Context, req client.LoginRequest) (*models.User, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func New(
-	repository repo.UserRepository,
+	repository repo.Repository,
 ) App {
 	return &app{
 		repository,

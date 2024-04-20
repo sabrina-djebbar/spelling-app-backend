@@ -1,60 +1,61 @@
 package client
 
+import (
+	"context"
+	"github.com/google/uuid"
+	http "github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/client"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/pkg/models"
+)
+
 const (
-	getUserPath           = "/get_user"
-	createUserPath        = "/create_user"
-	loginPath             = "/login"
+	GetUserPath           = "/get_user"
+	CreateUserPath        = "/create_user"
+	LoginPath             = "/login"
 	logoutPath            = "/logout"
 	editUserPath          = "/edit_user"
 	editParentDetailsPath = "/edit_parent_details"
 )
 
-type UserService interface {
-	GetUser(req GetUserRequest) (*User, error)
-	CreateUser(req CreateUserRequest) (*User, error)
-	EditUser(req EditUserRequest) (*User, error)
-	EditParentDetails(req EditParentDetailsRequest) (*User, error)
-	Login(req LoginRequest) (*User, error)
-	Logout(req LogoutRequest) error
-}
 type Client interface {
-	GetUser(req GetUserRequest) (*User, error)
-	CreateUser(req CreateUserRequest) (*User, error)
-	EditUser(req EditUserRequest) (*User, error)
-	EditParentDetails(req EditParentDetailsRequest) (*User, error)
-	Login(req LoginRequest) (*User, error)
-	Logout(req LogoutRequest) error
+	GetUser(req GetUserRequest) (*models.User, error)
+	CreateUser(req CreateUserRequest) (*models.User, error)
+	EditUser(req EditUserRequest) (*models.User, error)
+	EditParentDetails(req EditParentDetailsRequest) (*models.User, error)
+	Login(req LoginRequest) (*models.User, error)
 }
 
 type client struct {
 	internal *http.InternalClient
 }
 
-func NewFromEnv() *client {
+func New() *client {
 	cfg := http.InternalClientOptions{
-		Name:    "user",
+
 		Host:    "http://user",
 		Timeout: 5,
 	}
 
-	// config.LoadConfigItem("USER_CLIENT", &cfg)
+	/* s := http.Server{
+		Addr:         *bindAddress,      // configure the bind address
+		Handler:      sm,                // set the default handler
+		ErrorLog:     l,                 // set the logger for the server
+		ReadTimeout:  5 * time.Second,   // max time to read request from the client
+		WriteTimeout: 10 * time.Second,  // max time to write response to the client
+		IdleTimeout:  120 * time.Second, // max time for connections using TCP Keep-Alive
+	} */
 
-	return &client{
-		internal: http.NewInternalClient(cfg),
-	}
+	return &client{internal: http.NewInternalClient(cfg)}
 }
 
-func (c *client) GetUser(ctx context, req GetUserRequest) (*GetUserResponse, error) {
+func (c *client) GetUser(ctx context.Context, req GetUserRequest) (*GetUserResponse, error) {
 	res := &GetUserResponse{}
-	return res, c.internal.Do(ctx, "get_user", req, res)
+	return res, c.internal.Do(ctx, GetUserPath, req, res)
 
 }
 
-type CreateUserRequest struct {
-	Username    string `json:"username"`
-	Password    string `json:"password"`
-	ParentCode  string `json:"parent_code"`
-	DateOfBirth string `json:"date_of_birth"`
+func (c *client) CreateUser(ctx context.Context, req CreateUserRequest) (*CreateUserResponse, error) {
+	res := &CreateUserResponse{}
+	return res, c.internal.Do(ctx, CreateUserPath, req, res)
 }
 
 type EditUserRequest struct {

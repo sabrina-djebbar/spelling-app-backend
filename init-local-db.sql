@@ -1,1 +1,2 @@
 CREATE DATABASE "user";
+CREATE DATABASE "spelling";
