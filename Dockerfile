@@ -1,31 +1,17 @@
 # Use the official Go image as a base
 FROM golang:1.22 as builder
 
-# Set the current working directory inside the container
 WORKDIR /app
 
-# Copy go.mod and go.sum files to the container
-COPY go.mod .
-COPY go.sum .
-
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the entire project to the container
 COPY . .
 
-# Build the user
+# Build
 RUN go build -o main main.go
 
-# Use a minimal base image for the final container
-FROM alpine:latest
+EXPOSE 8080
 
-# Set the current working directory inside the container
-WORKDIR /root/
-
-COPY --from=builder /app/main .
-
-# Expose ports for both microservices
-EXPOSE 80
-
-# Command to run the microservices
-ENTRYPOINT ["/root/main"]
+# Run
+CMD ["./main"]

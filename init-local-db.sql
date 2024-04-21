@@ -1,2 +1,5 @@
+CREATE ROLE postgres SUPERUSER;
+
 CREATE DATABASE "user";
+
 CREATE DATABASE "spelling";

@@ -143,14 +143,6 @@ func (srv *server) RegisterHandler(path string, handler interface{}) {
 		})
 }
 
-func createContext(gctx *gin.Context) context.Context {
-	ctx := context.WithValue(gctx, "http_request", gctx.Request)
-	for k, v := range gctx.Keys {
-		ctx = context.WithValue(ctx, k, v)
-	}
-	return ctx
-}
-
 // RegisterGinHandler will register a handler using the gin.HandlerFunc implementation
 func (srv *server) RegisterGinHandler(method string, path string, handler gin.HandlerFunc) {
 	srv.router.Handle(method, path, handler)

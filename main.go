@@ -1,13 +1,15 @@
 package main
 
 import (
-	_ "github.com/lib/pq"
-	user "github.com/sabrina-djebbar/spelling-app-backend/srv/user"
+	user "github.com/sabrina-djebbar/spelling-app-backend/srv/user/cmd"
+
 	"github.com/spf13/cobra"
 	"log"
 	"math/rand"
 	"time"
 )
+
+var logger = log.Logger{}
 
 // https://www.youtube.com/watch?v=x_N2VjGQKr4
 var rootCMD = &cobra.Command{
@@ -27,10 +29,7 @@ func init() {
 
 	// Load the services
 	rootCMD.AddCommand(
-
-
 		user.CMD,
-
 	)
 }
 
@@ -40,7 +39,7 @@ func main() {
 
 	// Run command and exit with error code upon error
 	if err := rootCMD.Execute(); err != nil {
-		log.Fatalw("an error occurred executing that command", "err_message", err.Error(), "err", err)
+		logger.Fatal("an error occurred executing that command", "err_message", err.Error(), "err", err)
 		return
 	}
 }

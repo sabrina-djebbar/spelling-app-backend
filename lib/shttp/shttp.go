@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/id"
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/middleware"
 	"github.com/spf13/cobra"
 	"log"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 )
 
 type HTTPServer interface {
+	RegisterMiddleware(middleware middleware.Middleware)
 	RegisterHandler(path string, handler interface{})
 	RegisterGinHandler(method string, path string, handler gin.HandlerFunc)
 	Listen(addr string) error
@@ -48,6 +50,7 @@ func (srv *server) Listen(port string) error {
 		IdleTimeout:  60 * time.Second,
 		Handler:      srv.router,
 	}
+
 	log.Printf("listening on %s\n", srv.http.Addr)
 	// killable.RegisterKillable(srv.Close)
 	if err := srv.http.ListenAndServe(); err != nil {

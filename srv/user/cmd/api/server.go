@@ -1,14 +1,16 @@
 package api
 
 import (
-	"context"
-
-	"github.com/spf13/cobra"
-
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/database"
-	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/client"
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp"
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/middleware"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/app"
 	userRepo "github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure/repo"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/rpc"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/pkg/client"
+	"github.com/spf13/cobra"
+	"log"
 )
 
 var CMD = &cobra.Command{
@@ -18,23 +20,23 @@ var CMD = &cobra.Command{
 	RunE:  runE,
 }
 
-func RunE() {
-	ctx := context.Background()
-	db, err := database.New(ctx, "user")
+func runE(cmd *cobra.Command, _ []string) error {
+	db, err := database.New("user")
+	if err != nil {
+		log.Fatal("unable to create postgres client", err)
+	}
 	queries := repo.New(db)
 
-	repository := userRepo.NewRepo(queries)
+	repository := userRepo.NewRepo(*queries)
 	var (
 		a = app.New(repository)
 		r = rpc.New(a)
 	)
-	srv := gin.Default()
-	srv.GET(client.getUserPath, r.GetUser)
-	srv.POST(client.createUserPath, r.CreateUser)
-	srv.POST(client.loginPath, r.Login)
-	srv.POST(client.logoutPath, r.Logout)
-	srv.PUT(client.editUserPath, r.EditUser)
-	srv.PUT(client.editParentDetailsPath, r.EditParentDetails)
 
-	srv.Run(":8080")
+	router := shttp.New(cmd)
+	router.RegisterMiddleware(middleware.NewServiceIdentityMiddleware(cmd))
+	router.RegisterHandler(client.GetUserPath, r.GetUser)
+	router.RegisterHandler(client.CreateUserPath, r.CreateUser)
+
+	return router.Listen(":80")
 }

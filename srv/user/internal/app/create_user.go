@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/id"
 	userRepo "github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure"
-	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure/repo"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/pkg/client"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/pkg/models"
 	"time"
 )
 
@@ -17,7 +17,7 @@ type CreateUserParams struct {
 	Password    string
 }
 
-func (a *app) CreateUser(ctx context.Context, req client.CreateUserRequest) (*repo.User, error) {
+func (a *app) CreateUser(ctx context.Context, req client.CreateUserRequest) (*models.User, error) {
 
 	userId := id.Generate("user")
 	user := &CreateUserParams{
@@ -33,5 +33,10 @@ func (a *app) CreateUser(ctx context.Context, req client.CreateUserRequest) (*re
 		return nil, err
 	}
 
-	return u, nil
+	return &models.User{
+		ID:         u.ID,
+		Username:   u.Username,
+		Birthday:   u.DateOfBirth.Time,
+		ParentCode: u.ParentCode,
+	}, nil
 }

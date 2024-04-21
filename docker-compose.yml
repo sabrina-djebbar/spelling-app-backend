@@ -1,33 +1,33 @@
 version: "3.8"
-
 services:
+  builder: # Builder watches the files and rebuilds them when they change
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spelling-app
+
   postgres:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_USER: user
+      PGUSER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: user
     volumes:
       - ./pg_data:/var/lib/postgresql/data
       - ./init-local-db.sql:/docker-entrypoint-initdb.d/init-local-db.sql
     ports:
       - "5431:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d restaurant"]
-      interval: 5s
-      retries: 5
-      timeout: 5s
 
   user-microservice:
     build:
       context: .
       dockerfile: Dockerfile
-      target: builder
+    image: spelling-app-user
     restart: always
     ports:
       - "8080:8080"
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: "postgres://user:password@postgres/user?sslmode=disable"
+      VIRTUAL_HOST: "user.api.ext.local.spelling-app"
+      DATABASE_URL: "postgres://postgres:password@postgres:5432/user?sslmode=disable"
