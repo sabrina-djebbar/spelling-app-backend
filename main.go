@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/sabrina-djebbar/spelling-app-backend/srv/user"
+	user "github.com/sabrina-djebbar/spelling-app-backend/srv/user/cmd"
 	"github.com/spf13/cobra"
 	"log"
 	"math/rand"
@@ -28,20 +28,20 @@ func init() {
 
 	// Load the services
 	rootCMD.AddCommand(
-		//	user.CMD,
+		user.CMD,
 	)
 }
 
 func main() {
-	/*
-		// Listen to the kill command in the background to not cause issues whilst executing commands
-		//go killable.ListenToKill()
 
-		// Run command and exit with error code upon error
-		if err := rootCMD.Execute(); err != nil {
-			logger.Fatal("an error occurred executing that command", "err_message", err.Error(), "err", err)
-			return
-		}*/
-	user.Main(l)
+	// Listen to the kill command in the background to not cause issues whilst executing commands
+	//go killable.ListenToKill()
+
+	// Run command and exit with error code upon error
+	if err := rootCMD.Execute(); err != nil {
+		l.Fatal("an error occurred executing that command", "err_message", err.Error(), "err", err)
+		return
+	}
+	//	user.Main(l)
 
 }

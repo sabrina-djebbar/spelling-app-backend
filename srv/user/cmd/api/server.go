@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/database"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp"
-	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/middleware"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/app"
 	userRepo "github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure/repo"
@@ -22,7 +21,7 @@ var CMD = &cobra.Command{
 var logger log.Logger
 
 func runE(cmd *cobra.Command, _ []string) error {
-	db, err := database.New("user")
+	db, err := database.New(&logger, "user")
 	if err != nil {
 		logger.Fatal("unable to create postgres client", err)
 	}
@@ -35,11 +34,12 @@ func runE(cmd *cobra.Command, _ []string) error {
 	)
 
 	router := shttp.New(cmd)
-	router.RegisterMiddleware(middleware.NewLoggingMiddleware(cmd))
+	//	router.RegisterMiddleware(middleware.NewLoggingMiddleware(cmd))
 	router.RegisterHandler(client.GetUserPath, r.GetUser)
 	router.RegisterHandler(client.CreateUserPath, r.CreateUser)
-	router.RegisterHandler(client.ListUsersPath, r.ListUser)
-	router.RegisterHandler(client.LoginPath, r.ListUser)
+	//todo: request should not be empty
+	//	router.RegisterHandler(client.ListUsersPath, r.ListUser)
+	router.RegisterHandler(client.LoginPath, r.Login)
 
-	return router.Listen(":8080")
+	return router.Listen("8080")
 }

@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/database"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/app"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/rpc"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/pkg/client"
 
 	userRepo "github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure/repo"
@@ -23,17 +26,17 @@ func Main(logger *log.Logger) {
 	ctx := context.Background()
 	queries := repo.New(db)
 	repository := userRepo.NewRepo(*queries)
-	/* var (
+	var (
 		a = app.New(repository)
 		r = rpc.New(a)
-	)*/
-	var params = userRepo.CreateUserParams{
-		Username:    "Username",
-		DateOfBirth: time.Time{},
+	)
+	var params = client.CreateUserRequest{
+		Username:    "user_2",
+		DateOfBirth: time.Date(2002, time.July, 13, 00, 00, 00, 0, time.UTC),
 		ParentCode:  "1234",
 		Password:    "password",
 	}
-	// router := shttp.New()
+	// router := shttp.New(cmd)
 	//router.RegisterMiddleware(middleware.NewLoggingMiddleware(cmd))
 	//router.RegisterHandler(client.GetUserPath, r.GetUser)
 	//router.RegisterHandler(client.CreateUserPath, r.CreateUser)
@@ -41,7 +44,7 @@ func Main(logger *log.Logger) {
 	//	router.RegisterHandler(client.LoginPath, r.ListUser)
 
 	// return router.Listen(":8080")
-	_, err = repository.CreateUser(ctx, params)
+	_, err = r.CreateUser(ctx, params)
 	if err != nil {
 		fmt.Println("unable to create user", err)
 	}

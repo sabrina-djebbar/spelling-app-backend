@@ -1,6 +1,7 @@
 package shttp
 
 import (
+	"fmt"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/middleware"
 	"log"
 )
@@ -8,7 +9,7 @@ import (
 var logger = log.Logger{}
 
 func (srv *server) RegisterMiddleware(middleware middleware.Middleware) {
-	logger.Println("Registering Middleware %s", middleware.Name())
+	fmt.Println("Registering Middleware %s", middleware.Name())
 
 	srv.router.Use(middleware.Handle())
 }
