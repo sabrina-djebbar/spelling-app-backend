@@ -15,3 +15,15 @@ Content-Type: application/json
 
 {
 }
+
+### create_user -> todo fix date_of_birth parsing
+POST http://localhost:8080/create_user
+Content-Type: application/json
+
+{
+  "username": "test_user",
+  "password": "password123",
+  "parent_code": "1234",
+  "date_of_birth": "2002-01-02T00:00:00Z"
+}
+
