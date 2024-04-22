@@ -34,7 +34,7 @@ func runE(cmd *cobra.Command, _ []string) error {
 	)
 
 	router := shttp.New(cmd)
-	router.RegisterMiddleware(middleware.NewServiceIdentityMiddleware(cmd))
+	router.RegisterMiddleware(middleware.NewLoggingMiddleware(cmd))
 	router.RegisterHandler(client.GetUserPath, r.GetUser)
 	router.RegisterHandler(client.CreateUserPath, r.CreateUser)
 

@@ -1,5 +1,7 @@
-CREATE ROLE postgres SUPERUSER;
+-- Create the 'postgres' role
+CREATE ROLE postgres WITH SUPERUSER LOGIN PASSWORD 'secret';
 
-CREATE DATABASE "user";
+DROP DATABASE IF EXISTS "user";
 
-CREATE DATABASE "spelling";
+-- Create the 'user' database
+CREATE DATABASE "user" OWNER postgres;

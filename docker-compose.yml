@@ -5,24 +5,26 @@ services:
       context: .
       dockerfile: Dockerfile
     image: spelling-app
+  #  command: primary example
 
   postgres:
     image: postgres:latest
     restart: always
     environment:
-      PGUSER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
     volumes:
       - ./pg_data:/var/lib/postgresql/data
       - ./init-local-db.sql:/docker-entrypoint-initdb.d/init-local-db.sql
     ports:
-      - "5431:5432"
+      - "5432:5432"
 
   user-microservice:
+    image: spelling-app
     build:
       context: .
       dockerfile: Dockerfile
-    image: spelling-app-user
+      target: builder
     restart: always
     ports:
       - "8080:8080"
@@ -30,4 +32,4 @@ services:
       - postgres
     environment:
       VIRTUAL_HOST: "user.api.ext.local.spelling-app"
-      DATABASE_URL: "postgres://postgres:password@postgres:5432/user?sslmode=disable"
+      DATABASE_URL: "postgres://postgres:secret@localhost:5432/user?sslmode=disable"
