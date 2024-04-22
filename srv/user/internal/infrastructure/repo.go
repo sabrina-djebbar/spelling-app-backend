@@ -56,3 +56,14 @@ func (r *Repository) CreateUser(ctx context.Context, user CreateUserParams) (*re
 
 	return &u, nil
 }
+
+func (r *Repository) ListUsers(ctx context.Context) (*[]repo.User, error) {
+	u, err := r.q.ListUsers(ctx)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, err
+		}
+		return nil, err
+	}
+	return &u, nil
+}

@@ -14,6 +14,7 @@ const (
 	logoutPath            = "/logout"
 	editUserPath          = "/edit_user"
 	editParentDetailsPath = "/edit_parent_details"
+	ListUsersPath         = "/list_users"
 )
 
 type Client interface {
@@ -22,6 +23,7 @@ type Client interface {
 	EditUser(req EditUserRequest) (*models.User, error)
 	EditParentDetails(req EditParentDetailsRequest) (*models.User, error)
 	Login(req LoginRequest) (*models.User, error)
+	ListUsers(req ListUsersRequest) ([]*models.User, error)
 }
 
 type client struct {
@@ -56,6 +58,10 @@ func (c *client) GetUser(ctx context.Context, req GetUserRequest) (*GetUserRespo
 func (c *client) CreateUser(ctx context.Context, req CreateUserRequest) (*CreateUserResponse, error) {
 	res := &CreateUserResponse{}
 	return res, c.internal.Do(ctx, CreateUserPath, req, res)
+}
+func (c *client) ListUsers(ctx context.Context, req ListUsersRequest) (*ListUsersResponse, error) {
+	res := &ListUsersResponse{}
+	return res, c.internal.Do(ctx, ListUsersPath, req, res)
 }
 
 type EditUserRequest struct {

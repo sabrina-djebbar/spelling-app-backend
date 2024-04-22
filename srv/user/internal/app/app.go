@@ -13,6 +13,7 @@ type App interface {
 	EditUser(ctx context.Context, req client.EditUserRequest) (*models.User, error)
 	EditParentDetails(ctx context.Context, req client.EditParentDetailsRequest) (*models.User, error)
 	Login(ctx context.Context, req client.LoginRequest) (*models.User, error)
+	ListUsers(ctx context.Context) ([]models.User, error)
 }
 
 type app struct {

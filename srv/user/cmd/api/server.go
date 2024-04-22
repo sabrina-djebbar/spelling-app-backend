@@ -19,14 +19,15 @@ var CMD = &cobra.Command{
 	Long:  "User service implements complete management of a user",
 	RunE:  runE,
 }
+var logger log.Logger
 
 func runE(cmd *cobra.Command, _ []string) error {
 	db, err := database.New("user")
 	if err != nil {
-		log.Fatal("unable to create postgres client", err)
+		logger.Fatal("unable to create postgres client", err)
 	}
-	queries := repo.New(db)
 
+	queries := repo.New(db)
 	repository := userRepo.NewRepo(*queries)
 	var (
 		a = app.New(repository)
@@ -37,6 +38,7 @@ func runE(cmd *cobra.Command, _ []string) error {
 	router.RegisterMiddleware(middleware.NewLoggingMiddleware(cmd))
 	router.RegisterHandler(client.GetUserPath, r.GetUser)
 	router.RegisterHandler(client.CreateUserPath, r.CreateUser)
+	router.RegisterHandler(client.ListUsersPath, r.ListUser)
 
-	return router.Listen(":80")
+	return router.Listen(":8080")
 }

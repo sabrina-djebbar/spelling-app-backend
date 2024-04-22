@@ -5,7 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile
     image: spelling-app
-  #  command: primary example
 
   postgres:
     image: postgres:latest
@@ -24,7 +23,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: builder
     restart: always
     ports:
       - "8080:8080"

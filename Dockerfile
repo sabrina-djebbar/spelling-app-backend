@@ -10,7 +10,6 @@ COPY . .
 
 ENV GIN_MODE=release
 ENV CGO_ENABLED=0
-ENV COMMIT_SHA=linux
 
 # Build
 RUN go build -o main main.go
@@ -27,4 +26,4 @@ ENV CGO_ENABLED=0
 
 EXPOSE 80
 
-CMD [/"root/main"]
+CMD ["./main"]

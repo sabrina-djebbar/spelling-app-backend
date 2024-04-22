@@ -2,8 +2,16 @@
 POST {{protocol}}user.api.ext.localhost.spelling-app/create_user
 Content-Type: application/json
 
-{"username": "test_user",
-"password": "password123",
+{
+  "username": "test_user",
+  "password": "password123",
   "parent_code": "1234",
   "date_of_birth": "13-07-2002"
+}
+
+### list_users
+POST {{protocol}}user.api.ext.localhost.spelling-app/list_users
+Content-Type: application/json
+
+{
 }

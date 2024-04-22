@@ -53,20 +53,6 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const createUserV2 = `-- name: CreateUserV2 :one
-    BEGIN
-`
-
-type CreateUserV2Row struct {
-}
-
-func (q *Queries) CreateUserV2(ctx context.Context) (CreateUserV2Row, error) {
-	row := q.db.QueryRowContext(ctx, createUserV2)
-	var i CreateUserV2Row
-	err := row.Scan()
-	return i, err
-}
-
 const getUser = `-- name: GetUser :one
 SELECT id, username, parent_code, date_of_birth, created FROM users where id == $1
 `
@@ -82,4 +68,37 @@ func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
 		&i.Created,
 	)
 	return i, err
+}
+
+const listUsers = `-- name: ListUsers :many
+SELECT id, username, parent_code, date_of_birth, created FROM users
+`
+
+func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, listUsers)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.ParentCode,
+			&i.DateOfBirth,
+			&i.Created,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
