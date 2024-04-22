@@ -10,6 +10,7 @@ type RPC interface {
 	GetUser(ctx context.Context, req client.GetUserRequest) (*client.GetUserResponse, error)
 	CreateUser(ctx context.Context, req client.CreateUserRequest) (*client.CreateUserResponse, error)
 	ListUser(ctx context.Context) (*client.ListUsersResponse, error)
+	Login(ctx context.Context, req client.LoginRequest) (*client.LoginResponse, error)
 }
 
 type rpc struct {

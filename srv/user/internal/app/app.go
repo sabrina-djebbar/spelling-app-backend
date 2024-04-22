@@ -20,22 +20,12 @@ type app struct {
 	repository repo.Repository
 }
 
-func (a *app) GetUser(ctx context.Context, userID string) (*models.User, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (a *app) EditUser(ctx context.Context, req client.EditUserRequest) (*models.User, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
 func (a *app) EditParentDetails(ctx context.Context, req client.EditParentDetailsRequest) (*models.User, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (a *app) Login(ctx context.Context, req client.LoginRequest) (*models.User, error) {
 	//TODO implement me
 	panic("implement me")
 }

@@ -23,6 +23,56 @@ var (
 )
 
 func (srv *server) RegisterHandler(path string, handler interface{}) {
+	srv.router.POST(path,
+		// Perform auth validation before passing to next handler
+		//srv.ValidateAuth(requireAuth),
+		func(ctx *gin.Context) {
+			// Create a new request type and then get the value of it
+			requestPointer := reflect.New(requestType)
+			requestValue := requestPointer.Interface()
+
+			// Set default request options
+			var err error
+			reqType := JSON
+
+			// Assign the request body to the struct in the handler
+			if ctx.ContentType() == gin.MIMEJSON {
+				err = ctx.ShouldBindJSON(requestValue)
+			} else if ctx.ContentType() == gin.MIMEPOSTForm {
+				reqType = XML
+				err = ctx.ShouldBind(requestValue)
+			}
+
+			// Reject the request if binding fails
+			if err != nil {
+				// Check if validation error
+				// srv.errorTracker(ctx, err)
+
+				returnResponse(ctx, http.StatusBadRequest, err, reqType)
+
+				return
+			}
+
+			// Get the response out depending on the number of args
+			var resp interface{}
+
+			if err != nil {
+				err = srv.errorTracker(ctx, err)
+
+				return
+			}
+
+			// If no response body then simply return 204
+			if resp == nil {
+				ctx.Status(http.StatusNoContent)
+
+				return
+			}
+
+			returnResponse(ctx, http.StatusOK, resp, reqType)
+		})
+}
+func (srv *server) RegisterHandlerV2(path string, handler interface{}) {
 	// Gets the handlers function type to then get the arguments from and to later use in the .Call
 	handlerType := reflect.TypeOf(handler)
 	handlerValue := reflect.ValueOf(handler)

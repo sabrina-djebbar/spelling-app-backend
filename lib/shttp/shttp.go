@@ -29,12 +29,12 @@ type server struct {
 
 var HealthPath = "/"
 
-func New(cmd *cobra.Command) HTTPServer {
+func New() HTTPServer {
 	router := gin.New()
 
 	router.GET(HealthPath, func(ctx *gin.Context) { ctx.JSON(200, gin.H{"ready": "ok"}) })
 
-	router.Use(NewServiceIdentityMiddleware(cmd))
+	//router.Use(NewServiceIdentityMiddleware(cmd))
 	return &server{router: router}
 }
 

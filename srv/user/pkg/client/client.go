@@ -59,9 +59,15 @@ func (c *client) CreateUser(ctx context.Context, req CreateUserRequest) (*Create
 	res := &CreateUserResponse{}
 	return res, c.internal.Do(ctx, CreateUserPath, req, res)
 }
+
 func (c *client) ListUsers(ctx context.Context, req ListUsersRequest) (*ListUsersResponse, error) {
 	res := &ListUsersResponse{}
 	return res, c.internal.Do(ctx, ListUsersPath, req, res)
+}
+
+func (c *client) Login(ctx context.Context, req LoginRequest) (*LoginResponse, error) {
+	res := &LoginResponse{}
+	return res, c.internal.Do(ctx, LoginPath, req, res)
 }
 
 type EditUserRequest struct {
@@ -72,10 +78,4 @@ type EditUserRequest struct {
 type EditParentDetailsRequest struct {
 	user       uuid.UUID `json:"user,required"`
 	ParentCode string    `json:"parent_code"`
-}
-
-type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
 }

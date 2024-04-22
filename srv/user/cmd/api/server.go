@@ -39,6 +39,7 @@ func runE(cmd *cobra.Command, _ []string) error {
 	router.RegisterHandler(client.GetUserPath, r.GetUser)
 	router.RegisterHandler(client.CreateUserPath, r.CreateUser)
 	router.RegisterHandler(client.ListUsersPath, r.ListUser)
+	router.RegisterHandler(client.LoginPath, r.ListUser)
 
 	return router.Listen(":8080")
 }

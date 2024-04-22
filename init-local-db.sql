@@ -2,8 +2,7 @@
 CREATE ROLE postgres WITH SUPERUSER LOGIN PASSWORD 'secret';
 
 -- Create the 'user' database
--- CREATE DATABASE  "user" OWNER postgres;
-CREATE USER "user" WITH ENCRYPTED PASSWORD 'secret' IN ROLE postgres;
-CREATE DATABASE "user";
+CREATE USER users WITH ENCRYPTED PASSWORD 'secret' IN ROLE postgres;
+CREATE DATABASE users OWNER postgres;
 
 CREATE DATABASE spelling OWNER postgres;

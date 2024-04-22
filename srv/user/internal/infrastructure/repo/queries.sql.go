@@ -11,16 +11,17 @@ import (
 )
 
 const createCredentials = `-- name: CreateCredentials :exec
-INSERT INTO credentials ( user_id, password) VALUES($1,crypt($2,'crypt-des'))
+INSERT INTO credentials (id, user_id, password) VALUES($1,$2,crypt($3,'crypt-des'))
 `
 
 type CreateCredentialsParams struct {
+	ID     string
 	UserID string
 	Crypt  string
 }
 
 func (q *Queries) CreateCredentials(ctx context.Context, arg CreateCredentialsParams) error {
-	_, err := q.db.ExecContext(ctx, createCredentials, arg.UserID, arg.Crypt)
+	_, err := q.db.ExecContext(ctx, createCredentials, arg.ID, arg.UserID, arg.Crypt)
 	return err
 }
 
@@ -51,6 +52,48 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Created,
 	)
 	return i, err
+}
+
+const deleteUser = `-- name: DeleteUser :exec
+DELETE FROM users WHERE id == $1
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, deleteUser, id)
+	return err
+}
+
+const findByUsername = `-- name: FindByUsername :one
+SELECT id, username, parent_code, date_of_birth, created FROM users WHERE username == $1
+`
+
+func (q *Queries) FindByUsername(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, findByUsername, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.ParentCode,
+		&i.DateOfBirth,
+		&i.Created,
+	)
+	return i, err
+}
+
+const findCredentials = `-- name: FindCredentials :one
+SELECT id FROM credentials WHERE user_id == $1 and password == crypt($2, 'crypt-des')
+`
+
+type FindCredentialsParams struct {
+	UserID string
+	Crypt  string
+}
+
+func (q *Queries) FindCredentials(ctx context.Context, arg FindCredentialsParams) (string, error) {
+	row := q.db.QueryRowContext(ctx, findCredentials, arg.UserID, arg.Crypt)
+	var id string
+	err := row.Scan(&id)
+	return id, err
 }
 
 const getUser = `-- name: GetUser :one
