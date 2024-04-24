@@ -64,7 +64,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id string) error {
 }
 
 const findByUsername = `-- name: FindByUsername :one
-SELECT id, username, parent_code, date_of_birth, created FROM users WHERE username == $1
+SELECT id, username, parent_code, date_of_birth, created FROM users WHERE username = $1
 `
 
 func (q *Queries) FindByUsername(ctx context.Context, username string) (User, error) {
@@ -81,7 +81,7 @@ func (q *Queries) FindByUsername(ctx context.Context, username string) (User, er
 }
 
 const findCredentials = `-- name: FindCredentials :one
-SELECT id FROM credentials WHERE user_id == $1 and password == crypt($2, 'crypt-des')
+SELECT id FROM credentials WHERE user_id = $1 and password = crypt($2, 'crypt-des')
 `
 
 type FindCredentialsParams struct {
@@ -97,7 +97,7 @@ func (q *Queries) FindCredentials(ctx context.Context, arg FindCredentialsParams
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, parent_code, date_of_birth, created FROM users where id == $1
+SELECT id, username, parent_code, date_of_birth, created FROM users where id = $1
 `
 
 func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {

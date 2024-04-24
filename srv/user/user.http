@@ -27,3 +27,11 @@ Content-Type: application/json
   "date_of_birth": "2002-01-02T00:00:00Z"
 }
 
+### login TODO: fix error logging
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "test_user",
+  "password": "password123"
+}

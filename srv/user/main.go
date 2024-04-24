@@ -2,9 +2,7 @@ package user
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/database"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/app"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/rpc"
@@ -13,7 +11,6 @@ import (
 	userRepo "github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure/repo"
 	"log"
-	"time"
 )
 
 func Main(logger *log.Logger) {
@@ -30,11 +27,9 @@ func Main(logger *log.Logger) {
 		a = app.New(repository)
 		r = rpc.New(a)
 	)
-	var params = client.CreateUserRequest{
-		Username:    "user_2",
-		DateOfBirth: time.Date(2002, time.July, 13, 00, 00, 00, 0, time.UTC),
-		ParentCode:  "1234",
-		Password:    "password",
+	var params = client.LoginRequest{
+		Username: "test_user",
+		Password: "password",
 	}
 	// router := shttp.New(cmd)
 	//router.RegisterMiddleware(middleware.NewLoggingMiddleware(cmd))
@@ -44,18 +39,9 @@ func Main(logger *log.Logger) {
 	//	router.RegisterHandler(client.LoginPath, r.ListUser)
 
 	// return router.Listen(":8080")
-	_, err = r.CreateUser(ctx, params)
+	res, err := r.Login(ctx, params)
 	if err != nil {
-		fmt.Println("unable to create user", err)
+		fmt.Println("unable to login user", err)
 	}
-	productList, err := queries.ListUsers(ctx)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			fmt.Println("no entries found, " + err.Error())
-		}
-		fmt.Println(err)
-	}
-	for _, element := range productList {
-		fmt.Println(element.Username)
-	}
+	fmt.Println("response", res)
 }

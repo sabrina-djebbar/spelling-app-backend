@@ -5,16 +5,16 @@ INSERT INTO users (id, username, date_of_birth, parent_code) VALUES ($1, $2, $3,
 INSERT INTO credentials (id, user_id, password) VALUES($1,$2,crypt($3,'crypt-des'));
 
 -- name: GetUser :one
-SELECT * FROM users where id == $1;
+SELECT * FROM users where id = $1;
 
 -- name: ListUsers :many
 SELECT * FROM users;
 
 -- name: FindByUsername :one
-SELECT * FROM users WHERE username == $1;
+SELECT * FROM users WHERE username = $1;
 
 -- name: FindCredentials :one
-SELECT id FROM credentials WHERE user_id == $1 and password == crypt($2, 'crypt-des');
+SELECT id FROM credentials WHERE user_id = $1 and password = crypt($2, 'crypt-des');
 
 -- name: DeleteUser :exec
 DELETE FROM users WHERE id == $1;
