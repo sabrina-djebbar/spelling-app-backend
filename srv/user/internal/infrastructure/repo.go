@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/jackc/pgx/v5"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/id"
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/serr"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure/repo"
 	"time"
 )
@@ -23,7 +24,7 @@ func (r *Repository) GetUser(ctx context.Context, id string) (*repo.User, error)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, err
+			return nil, serr.New("No user found with given ID")
 		}
 		return nil, err
 	}
@@ -48,10 +49,9 @@ func (r *Repository) CreateUser(ctx context.Context, user CreateUserParams) (*re
 
 	u, err := r.q.CreateUser(ctx, req)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errors.New("unable to create user: " + err.Error())
-		}
-		return nil, errors.New("other user error\n " + err.Error())
+
+		return nil, serr.Wrap(err, serr.WithMessage("Unable to create user"))
+
 	}
 
 	err = r.q.CreateCredentials(ctx, repo.CreateCredentialsParams{
@@ -60,10 +60,7 @@ func (r *Repository) CreateUser(ctx context.Context, user CreateUserParams) (*re
 		Crypt:  user.Password,
 	})
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errors.New("unable to create credentials: " + err.Error())
-		}
-		return nil, errors.New("other credentials error\n " + err.Error())
+		return nil, serr.Wrap(err, serr.WithMessage("Unable to create credentials"))
 	}
 
 	return &u, nil
@@ -73,9 +70,10 @@ func (r *Repository) ListUsers(ctx context.Context) (*[]repo.User, error) {
 	u, err := r.q.ListUsers(ctx)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, err
+			return nil, nil
 		}
-		return nil, err
+		return nil, serr.Wrap(err, serr.WithMessage("Unable to list users"))
+
 	}
 	return &u, nil
 }
@@ -85,9 +83,9 @@ func (r *Repository) FindByUsername(ctx context.Context, username string) (*repo
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, errors.New("unable to find user by username: " + username)
+			return nil, serr.Wrap(err, serr.WithMessage("No user found with given username: "+username))
 		}
-		return nil, err
+		return nil, serr.Wrap(err, serr.WithMessage("Unable to find user with given username: "+username))
 	}
 	return &u, nil
 }
@@ -98,14 +96,14 @@ type FindCredentialParams struct {
 }
 
 func (r *Repository) FindCredentials(ctx context.Context, credentials FindCredentialParams) (string, error) {
-	id, err := r.q.FindCredentials(ctx, repo.FindCredentialsParams{UserID: credentials.UserID, Crypt: credentials.Crypt})
+	uid, err := r.q.FindCredentials(ctx, repo.FindCredentialsParams{UserID: credentials.UserID, Crypt: credentials.Crypt})
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			panic(errors.New("unable to find credentials for user: " + credentials.UserID))
+			return "", serr.Wrap(err, serr.WithMessage("No credentials found"))
 		}
-		panic(err)
+		return "", serr.Wrap(err, serr.WithMessage("Unable to credentials"))
 	}
-	return id, nil
+	return uid, nil
 }
 
 func (r *Repository) DeleteUser(ctx context.Context, id string) error {

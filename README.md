@@ -8,7 +8,7 @@
 
 ```shell
   docker run --name pg-container -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres
-  docker exec -ti pg-container createdb -U postgres users
+  docker exec -ti pg-container createdb -U postgres user
   docker exec -ti pg-container psql -U postgres
 ```
 this creates a postgres instance with a database names user with the user postgres
@@ -17,7 +17,7 @@ to connect to the user db run
 ```
 \c users
 ```
-from here you can run any postsql query
+from here you can run any postgresql query
 
 #### Now to the microservice
 

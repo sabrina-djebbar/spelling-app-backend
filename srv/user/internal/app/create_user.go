@@ -20,7 +20,6 @@ func (a *app) CreateUser(ctx context.Context, req client.CreateUserRequest) (*mo
 
 	// userId := id.Generate("user")
 	user := userRepo.CreateUserParams{
-
 		Username:    req.Username,
 		DateOfBirth: req.DateOfBirth,
 		ParentCode:  req.ParentCode,

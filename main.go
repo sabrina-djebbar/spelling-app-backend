@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/killable"
 	user "github.com/sabrina-djebbar/spelling-app-backend/srv/user/cmd"
 	"github.com/spf13/cobra"
 	"log"
@@ -35,7 +36,7 @@ func init() {
 func main() {
 
 	// Listen to the kill command in the background to not cause issues whilst executing commands
-	//go killable.ListenToKill()
+	go killable.ListenToKill()
 
 	// Run command and exit with error code upon error
 	if err := rootCMD.Execute(); err != nil {

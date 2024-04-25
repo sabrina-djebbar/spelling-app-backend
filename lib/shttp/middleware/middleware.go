@@ -9,7 +9,7 @@ type Middleware interface {
 	Handle() gin.HandlerFunc
 }
 
-// ErrorMiddleware is a special type of middleware that allows tracking of errors in non fatal crashes
+// ErrorMiddleware is a special type of middleware that allows tracking of serr in non fatal crashes
 type ErrorMiddleware interface {
 	Name() string
 

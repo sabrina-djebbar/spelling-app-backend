@@ -3,6 +3,11 @@ module github.com/sabrina-djebbar/spelling-app-backend
 go 1.22.2
 
 require (
+	go.uber.org/atomic v1.11.0
+	golang.org/x/sync v0.7.0
+)
+
+require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/sonic v1.11.5 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect

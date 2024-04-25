@@ -8,11 +8,8 @@ RUN go mod download
 
 COPY . .
 
-ENV GIN_MODE=release
-ENV CGO_ENABLED=0
-
 # Build
-RUN go build -o main main.go
+RUN CGO_ENABLED=0 go build -o main main.go
 
 # Create new image and import just the binary
 FROM alpine:3.16
@@ -26,4 +23,4 @@ ENV CGO_ENABLED=0
 
 EXPOSE 80
 
-CMD ["./main"]
+CMD ["/root/main"]

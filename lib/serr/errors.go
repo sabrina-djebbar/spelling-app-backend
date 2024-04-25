@@ -1,4 +1,4 @@
-package errors
+package serr
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 
 // Error is a formatted error response.
 type Error struct {
-	Code    string      `json:"code,omitempty"`
+	Code    ErrCode     `json:"code,omitempty"`
 	Message string      `json:"message"`
 	Details interface{} `json:"details,omitempty"`
 
@@ -67,10 +67,9 @@ func (e *Error) UnmarshalJSON(data []byte) error {
 
 func (e Error) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&jsonAlias{
-		Code:    e.Code,
-		Message: e.Message,
-		Details: e.Details,
-
+		Code:       e.Code,
+		Message:    e.Message,
+		Details:    e.Details,
 		InnerError: e.InnerError,
 	})
 }
@@ -80,7 +79,7 @@ type Details map[string]interface{}
 
 type WrapOption func(Error) Error
 
-func WithCode(code string) WrapOption {
+func WithCode(code ErrCode) WrapOption {
 	return func(e Error) Error {
 		e.Code = code
 		return e
@@ -144,11 +143,16 @@ func Wrap(err error, opts ...WrapOption) Error {
 	// extract any inner werr details
 	if innerWErr := (Error{}); errors.As(err, &innerWErr) {
 		errResponse.Code = innerWErr.Code
-
 		if innerWErr.Details != nil {
 			details["inner_details"] = innerWErr.Details
 		}
 	}
+
+	// extract any inner validation details
+	/* if innerValidationErr := (validator.ValidationError{}); errors.As(err, &innerValidationErr) {
+		errResponse.Code = ErrCodeBadRequest
+		details["validation_details"] = innerValidationErr.Details
+	} */
 
 	if len(details) != 0 {
 		errResponse.Details = details

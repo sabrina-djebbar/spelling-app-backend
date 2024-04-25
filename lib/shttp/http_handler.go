@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/serr"
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/validator"
 	"log"
 	"net/http"
 	"reflect"
@@ -59,7 +61,7 @@ func (srv *server) RegisterHandler(path string, handler interface{}) {
 		}
 
 		// Ensure that our secondary out is of type error
-		// This is to allow graceful errors without having to use recover
+		// This is to allow graceful serr without having to use recover
 		if !handlerType.Out(1).AssignableTo(errType) {
 			panic("Invalid handler arg. Out 2 must be assignable to error")
 		}
@@ -93,11 +95,22 @@ func (srv *server) RegisterHandler(path string, handler interface{}) {
 			// Reject the request if binding fails
 			if err != nil {
 				// Check if validation error
-				// srv.errorTracker(ctx, err)
+				vErr := validator.ValidationError{}
+				if ok := errors.As(err, &vErr); ok {
+					returnResponse(ctx, http.StatusBadRequest, serr.Error{
+						Code:    serr.ErrCodeBadRequest,
+						Message: vErr.Message,
+						Details: vErr.Details,
+					}, reqType)
 
-				returnResponse(ctx, http.StatusBadRequest, err, reqType)
+					return
+				}
+				returnResponse(ctx, http.StatusBadRequest, serr.Error{
+					Code:    serr.ErrCodeBadRequest,
+					Message: "invalid_body",
+					Details: err.Error(),
+				}, reqType)
 
-				return
 			}
 
 			// Create a new args collection for passing into the Call
@@ -129,7 +142,20 @@ func (srv *server) RegisterHandler(path string, handler interface{}) {
 			}
 
 			if err != nil {
-				err = srv.errorTracker(ctx, err)
+				status := http.StatusInternalServerError
+
+				// If the error type is assignable to our error type then just return it
+				responseErr := serr.Error{}
+				if ok := errors.As(err, &responseErr); ok {
+					status = serr.HttpStatus(responseErr)
+					returnResponse(ctx, status, responseErr, reqType)
+					return
+				}
+
+				returnResponse(ctx, status, serr.Error{
+					Code:    serr.ErrCodeInternalService,
+					Message: err.Error(),
+				}, reqType)
 
 				return
 			}
@@ -154,7 +180,7 @@ func returnResponse(ctx *gin.Context, status int, out interface{}, respType resp
 	defer func() {
 		if e := recover(); e != nil {
 			if err, ok := e.(error); ok {
-				// handle "connection reset by peer" and "broken pipe" errors
+				// handle "connection reset by peer" and "broken pipe" serr
 				// https://gosamples.dev/connection-reset-by-peer/ https://gosamples.dev/broken-pipe/
 				if errors.Is(err, syscall.ECONNRESET) || errors.Is(err, syscall.EPIPE) {
 					log.Panic("connection error while writing the response", err)
@@ -177,7 +203,7 @@ func returnResponse(ctx *gin.Context, status int, out interface{}, respType resp
 		}
 		ctx.XML(status, out)
 	} else {
-		panic(http.ErrServerClosed)
+		panic(serr.New("unknown_response_type", serr.WithCode(serr.ErrCodeInternalService)))
 	}
 }
 
