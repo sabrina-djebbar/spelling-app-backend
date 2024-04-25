@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/jackc/pgx/v5"
+  
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/database"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/id"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/serr"
