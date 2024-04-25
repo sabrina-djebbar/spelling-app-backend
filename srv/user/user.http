@@ -1,0 +1,37 @@
+### create_user
+POST {{protocol}}user.api.ext.localhost.spelling-app/create_user
+Content-Type: application/json
+
+{
+  "username": "test_user",
+  "password": "password123",
+  "parent_code": "1234",
+  "date_of_birth": "13-07-2002"
+}
+
+### list_users
+POST {{protocol}}user.api.ext.localhost.spelling-app/list_users
+Content-Type: application/json
+
+{
+}
+
+### create_user -> todo fix date_of_birth parsing
+POST http://localhost:8080/create_user
+Content-Type: application/json
+
+{
+  "username": "test_user",
+  "password": "password123",
+  "parent_code": "1234",
+  "date_of_birth": "2002-01-02T00:00:00Z"
+}
+
+### login TODO: fix error logging
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "test_user",
+  "password": "password123"
+}
