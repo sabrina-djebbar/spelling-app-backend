@@ -15,10 +15,10 @@ func (a *app) ListUsers(ctx context.Context) ([]models.User, error) {
 
 	for _, user := range *u {
 		users = append(users, models.User{
-			ID:         user.ID,
-			Username:   user.Username,
-			Birthday:   user.DateOfBirth.Time, // Access Time from sql.NullTime
-			ParentCode: user.ParentCode,
+			ID:          user.ID,
+			Username:    user.Username,
+			DateOfBirth: user.DateOfBirth.Time, // Access Time from sql.NullTime
+			ParentCode:  user.ParentCode,
 		})
 	}
 

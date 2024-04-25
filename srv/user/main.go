@@ -13,7 +13,7 @@ import (
 	"log"
 )
 
-func Main(logger *log.Logger) {
+func main(logger *log.Logger) {
 	db, err := database.New(logger, "user")
 	if err != nil {
 		logger.Fatal("unable to create postgres client", err)
@@ -27,10 +27,12 @@ func Main(logger *log.Logger) {
 		a = app.New(repository)
 		r = rpc.New(a)
 	)
-	var params = client.LoginRequest{
-		Username: "test_user",
-		Password: "password",
+
+	var params = client.EditUserRequest{
+		UserID:      "VVllNSUIGg03MrmrDWW52fJszDi9ITS2Ly6uWp5Okdc_user",
+		DateOfBirth: "2002-01-02T00:00:00Z",
 	}
+  
 	// router := shttp.New(cmd)
 	//router.RegisterMiddleware(middleware.NewLoggingMiddleware(cmd))
 	//router.RegisterHandler(client.GetUserPath, r.GetUser)
@@ -39,7 +41,9 @@ func Main(logger *log.Logger) {
 	//	router.RegisterHandler(client.LoginPath, r.ListUser)
 
 	// return router.Listen(":8080")
-	res, err := r.Login(ctx, params)
+
+	res, err := r.EditUser(ctx, params)
+
 	if err != nil {
 		fmt.Println("unable to login user", err)
 	}

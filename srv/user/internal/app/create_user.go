@@ -32,9 +32,9 @@ func (a *app) CreateUser(ctx context.Context, req client.CreateUserRequest) (*mo
 	}
 
 	return &models.User{
-		ID:         u.ID,
-		Username:   u.Username,
-		Birthday:   u.DateOfBirth.Time,
-		ParentCode: u.ParentCode,
+		ID:          u.ID,
+		Username:    u.Username,
+		DateOfBirth: u.DateOfBirth.Time,
+		ParentCode:  u.ParentCode,
 	}, nil
 }

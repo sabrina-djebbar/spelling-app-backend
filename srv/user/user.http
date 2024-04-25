@@ -35,3 +35,21 @@ Content-Type: application/json
   "username": "test_user",
   "password": "password123"
 }
+
+### update_parent_code
+POST http://localhost:8080/edit_parent_details
+Content-Type: application/json
+
+{
+  "user_id": "VVllNSUIGg03MrmrDWW52fJszDi9ITS2Ly6uWp5Okdc_user",
+  "parent_code" : "2345"
+}
+
+### update_user
+POST http://localhost:8080/edit_user
+Content-Type: application/json
+
+{
+  "user_id": "VVllNSUIGg03MrmrDWW52fJszDi9ITS2Ly6uWp5Okdc_user",
+  "date_of_birth" : "2002-01-02"
+}

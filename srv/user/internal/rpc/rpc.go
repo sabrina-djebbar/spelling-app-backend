@@ -11,6 +11,8 @@ type RPC interface {
 	CreateUser(ctx context.Context, req client.CreateUserRequest) (*client.CreateUserResponse, error)
 	ListUser(ctx context.Context) (*client.ListUsersResponse, error)
 	Login(ctx context.Context, req client.LoginRequest) (*client.LoginResponse, error)
+	EditParentCode(ctx context.Context, req client.EditParentCodeRequest) (*client.EditParentCodeResponse, error)
+	EditUser(ctx context.Context, req client.EditUserRequest) (*client.EditUserResponse, error)
 }
 
 type rpc struct {

@@ -12,8 +12,8 @@ const (
 	CreateUserPath        = "/create_user"
 	LoginPath             = "/login"
 	logoutPath            = "/logout"
-	editUserPath          = "/edit_user"
-	editParentDetailsPath = "/edit_parent_details"
+	EditUserPath          = "/edit_user"
+	EditParentDetailsPath = "/edit_parent_details"
 	ListUsersPath         = "/list_users"
 )
 
@@ -21,7 +21,7 @@ type Client interface {
 	GetUser(req GetUserRequest) (*models.User, error)
 	CreateUser(req CreateUserRequest) (*models.User, error)
 	EditUser(req EditUserRequest) (*models.User, error)
-	EditParentDetails(req EditParentDetailsRequest) (*models.User, error)
+	EditParentDetails(req EditParentCodeRequest) (*models.User, error)
 	Login(req LoginRequest) (*models.User, error)
 	ListUsers(req ListUsersRequest) ([]*models.User, error)
 }
@@ -68,14 +68,4 @@ func (c *client) ListUsers(ctx context.Context, req ListUsersRequest) (*ListUser
 func (c *client) Login(ctx context.Context, req LoginRequest) (*LoginResponse, error) {
 	res := &LoginResponse{}
 	return res, c.internal.Do(ctx, LoginPath, req, res)
-}
-
-type EditUserRequest struct {
-	Username string `json:"username"`
-	Birthday string `json:"date_of_birth"`
-}
-
-type EditParentDetailsRequest struct {
-	user       uuid.UUID `json:"user,required"`
-	ParentCode string    `json:"parent_code"`
 }

@@ -5,9 +5,12 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/jackc/pgx/v5"
+  
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/database"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/id"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/serr"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure/repo"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/pkg/models"
 	"time"
 )
 
@@ -108,4 +111,25 @@ func (r *Repository) FindCredentials(ctx context.Context, credentials FindCreden
 
 func (r *Repository) DeleteUser(ctx context.Context, id string) error {
 	panic("implement me")
+}
+
+func (r *Repository) EditParentCode(ctx context.Context, id string, code string) (*repo.User, error) {
+	u, err := r.q.UpdateParentCode(ctx, repo.UpdateParentCodeParams{ID: id, ParentCode: code})
+	if err != nil {
+		return nil, serr.Wrap(err, serr.WithMessage("Unable to update parent code"), serr.WithCode(serr.ErrCodeInternalService))
+	}
+	return &u, nil
+}
+
+func (r *Repository) EditUser(ctx context.Context, args models.User) (*repo.User, error) {
+
+	user, err := r.q.UpdateUser(ctx, repo.UpdateUserParams{
+		ID:          args.ID,
+		DateOfBirth: database.TimeToSQLNullTime(args.DateOfBirth),
+		Username:    args.Username,
+	})
+	if err != nil {
+		return nil, serr.Wrap(err, serr.WithMessage("Unable to update parent code"), serr.WithCode(serr.ErrCodeInternalService))
+	}
+	return &user, nil
 }

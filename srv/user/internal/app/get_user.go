@@ -11,5 +11,5 @@ func (a *app) GetUser(ctx context.Context, userID string) (*models.User, error) 
 		return nil, err
 	}
 
-	return &models.User{ID: u.ID, Username: u.Username, Birthday: u.DateOfBirth.Time, ParentCode: u.ParentCode}, nil
+	return &models.User{ID: u.ID, Username: u.Username, DateOfBirth: u.DateOfBirth.Time, ParentCode: u.ParentCode}, nil
 }
