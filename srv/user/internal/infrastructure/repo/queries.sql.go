@@ -145,3 +145,54 @@ func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
 	}
 	return items, nil
 }
+
+const updateParentCode = `-- name: UpdateParentCode :one
+UPDATE users
+SET parent_code = $2
+WHERE id = $1
+RETURNING id, username, parent_code, date_of_birth, created
+`
+
+type UpdateParentCodeParams struct {
+	ID         string
+	ParentCode string
+}
+
+func (q *Queries) UpdateParentCode(ctx context.Context, arg UpdateParentCodeParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateParentCode, arg.ID, arg.ParentCode)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.ParentCode,
+		&i.DateOfBirth,
+		&i.Created,
+	)
+	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET date_of_birth = $2, username = $3
+WHERE id = $1
+RETURNING id, username, parent_code, date_of_birth, created
+`
+
+type UpdateUserParams struct {
+	ID          string
+	DateOfBirth sql.NullTime
+	Username    string
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUser, arg.ID, arg.DateOfBirth, arg.Username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.ParentCode,
+		&i.DateOfBirth,
+		&i.Created,
+	)
+	return i, err
+}

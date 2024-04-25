@@ -109,3 +109,11 @@ func (r *Repository) FindCredentials(ctx context.Context, credentials FindCreden
 func (r *Repository) DeleteUser(ctx context.Context, id string) error {
 	panic("implement me")
 }
+
+func (r *Repository) EditParentCode(ctx context.Context, id string, code string) (*repo.User, error) {
+	u, err := r.q.UpdateParentCode(ctx, repo.UpdateParentCodeParams{ID: id, ParentCode: code})
+	if err != nil {
+		return nil, serr.Wrap(err, serr.WithMessage("Unable to update parent code"), serr.WithCode(serr.ErrCodeInternalService))
+	}
+	return &u, nil
+}

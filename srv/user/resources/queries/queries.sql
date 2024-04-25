@@ -18,3 +18,15 @@ SELECT id FROM credentials WHERE user_id = $1 and password = crypt($2, 'crypt-de
 
 -- name: DeleteUser :exec
 DELETE FROM users WHERE id == $1;
+
+-- name: UpdateParentCode :one
+UPDATE users
+SET parent_code = $2
+WHERE id = $1
+RETURNING *;
+
+-- name: UpdateUser :one
+UPDATE users
+SET date_of_birth = $2, username = $3
+WHERE id = $1
+RETURNING *;
