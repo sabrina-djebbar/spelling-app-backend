@@ -68,8 +68,3 @@ func (c *client) Login(ctx context.Context, req LoginRequest) (*LoginResponse, e
 	res := &LoginResponse{}
 	return res, c.internal.Do(ctx, LoginPath, req, res)
 }
-
-type EditUserRequest struct {
-	Username string `json:"username"`
-	Birthday string `json:"date_of_birth"`
-}

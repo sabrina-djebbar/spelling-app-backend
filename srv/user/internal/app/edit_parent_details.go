@@ -12,9 +12,9 @@ func (a *app) EditParentDetails(ctx context.Context, req client.EditParentCodeRe
 		return nil, err
 	}
 	return &models.User{
-		ID:         u.ID,
-		Username:   u.Username,
-		Birthday:   u.DateOfBirth.Time,
-		ParentCode: u.ParentCode,
+		ID:          u.ID,
+		Username:    u.Username,
+		DateOfBirth: u.DateOfBirth.Time,
+		ParentCode:  u.ParentCode,
 	}, nil
 }

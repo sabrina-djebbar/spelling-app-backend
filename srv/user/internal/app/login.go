@@ -18,9 +18,9 @@ func (a *app) Login(ctx context.Context, req client.LoginRequest) (*models.User,
 		return nil, err
 	}
 	return &models.User{
-		ID:         user.ID,
-		Username:   user.Username,
-		Birthday:   user.DateOfBirth.Time,
-		ParentCode: user.ParentCode,
+		ID:          user.ID,
+		Username:    user.Username,
+		DateOfBirth: user.DateOfBirth.Time,
+		ParentCode:  user.ParentCode,
 	}, nil
 }
