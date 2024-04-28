@@ -8,60 +8,122 @@ package repo
 import (
 	"context"
 	"database/sql"
-
-	"github.com/google/uuid"
 )
 
-const createCredentials = `-- name: CreateCredentials :exec
-INSERT INTO credentials (user_id, password) VALUES($1,crypt($2,'crypt-des'))
+const addWordToSet = `-- name: AddWordToSet :exec
+INSERT INTO spelling_set_words(set_id, word_id) VALUES ($1, $2)
 `
 
-type CreateCredentialsParams struct {
-	UserID uuid.UUID
-	Crypt  string
+type AddWordToSetParams struct {
+	SetID  string
+	WordID string
 }
 
-func (q *Queries) CreateCredentials(ctx context.Context, arg CreateCredentialsParams) error {
-	_, err := q.db.ExecContext(ctx, createCredentials, arg.UserID, arg.Crypt)
+func (q *Queries) AddWordToSet(ctx context.Context, arg AddWordToSetParams) error {
+	_, err := q.db.ExecContext(ctx, addWordToSet, arg.SetID, arg.WordID)
 	return err
 }
 
-const createUser = `-- name: CreateUser :one
-INSERT INTO users (username, date_of_birth, parent_code) VALUES ($1, $2, $3) RETURNING id, username, parent_code, date_of_birth, created
+const createSpellingSet = `-- name: CreateSpellingSet :one
+INSERT INTO spelling_set(id, name, recommended_age, description, tags, creator) VALUES ($1, $2,$3,$4,$5, $6) RETURNING id, name, recommended_age, description, tags, creator, created
 `
 
-type CreateUserParams struct {
-	Username    string
-	DateOfBirth sql.NullTime
-	ParentCode  string
+type CreateSpellingSetParams struct {
+	ID             string
+	Name           string
+	RecommendedAge int32
+	Description    sql.NullString
+	Tags           sql.NullString
+	Creator        string
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.DateOfBirth, arg.ParentCode)
-	var i User
+func (q *Queries) CreateSpellingSet(ctx context.Context, arg CreateSpellingSetParams) (SpellingSet, error) {
+	row := q.db.QueryRowContext(ctx, createSpellingSet,
+		arg.ID,
+		arg.Name,
+		arg.RecommendedAge,
+		arg.Description,
+		arg.Tags,
+		arg.Creator,
+	)
+	var i SpellingSet
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
-		&i.ParentCode,
-		&i.DateOfBirth,
+		&i.Name,
+		&i.RecommendedAge,
+		&i.Description,
+		&i.Tags,
+		&i.Creator,
 		&i.Created,
 	)
 	return i, err
 }
 
-const getUser = `-- name: GetUser :one
-SELECT id, username, parent_code, date_of_birth, created FROM users where id == $1
+const createSpellingWord = `-- name: CreateSpellingWord :one
+INSERT INTO spelling_word (id, spelling, difficulty, definition, total_available_points, class, tags) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, spelling, definition, class, tags, difficulty, total_available_points, created
 `
 
-func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUser, id)
-	var i User
+type CreateSpellingWordParams struct {
+	ID                   string
+	Spelling             string
+	Difficulty           float64
+	Definition           sql.NullString
+	TotalAvailablePoints int32
+	Class                string
+	Tags                 sql.NullString
+}
+
+func (q *Queries) CreateSpellingWord(ctx context.Context, arg CreateSpellingWordParams) (SpellingWord, error) {
+	row := q.db.QueryRowContext(ctx, createSpellingWord,
+		arg.ID,
+		arg.Spelling,
+		arg.Difficulty,
+		arg.Definition,
+		arg.TotalAvailablePoints,
+		arg.Class,
+		arg.Tags,
+	)
+	var i SpellingWord
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
-		&i.ParentCode,
-		&i.DateOfBirth,
+		&i.Spelling,
+		&i.Definition,
+		&i.Class,
+		&i.Tags,
+		&i.Difficulty,
+		&i.TotalAvailablePoints,
 		&i.Created,
 	)
 	return i, err
+}
+
+const getSpellingWord = `-- name: GetSpellingWord :one
+SELECT id, spelling, definition, class, tags, difficulty, total_available_points, created FROM spelling_word where id = $1
+`
+
+func (q *Queries) GetSpellingWord(ctx context.Context, id string) (SpellingWord, error) {
+	row := q.db.QueryRowContext(ctx, getSpellingWord, id)
+	var i SpellingWord
+	err := row.Scan(
+		&i.ID,
+		&i.Spelling,
+		&i.Definition,
+		&i.Class,
+		&i.Tags,
+		&i.Difficulty,
+		&i.TotalAvailablePoints,
+		&i.Created,
+	)
+	return i, err
+}
+
+const getWordDifficulty = `-- name: GetWordDifficulty :one
+SELECT difficulty from spelling_word where id = $1
+`
+
+func (q *Queries) GetWordDifficulty(ctx context.Context, id string) (float64, error) {
+	row := q.db.QueryRowContext(ctx, getWordDifficulty, id)
+	var difficulty float64
+	err := row.Scan(&difficulty)
+	return difficulty, err
 }

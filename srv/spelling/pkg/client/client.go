@@ -1,72 +1,43 @@
 package client
 
-const (
-	getUserPath           = "/get_user"
-	createUserPath        = "/create_user"
-	loginPath             = "/login"
-	logoutPath            = "/logout"
-	editUserPath          = "/edit_user"
-	editParentDetailsPath = "/edit_parent_details"
+import (
+	"context"
+	http "github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/client"
 )
 
-type UserService interface {
-	GetUser(req GetUserRequest) (*User, error)
-	CreateUser(req CreateUserRequest) (*User, error)
-	EditUser(req EditUserRequest) (*User, error)
-	EditParentDetails(req EditParentDetailsRequest) (*User, error)
-	Login(req LoginRequest) (*User, error)
-	Logout(req LogoutRequest) error
-}
+const (
+	CreateSpellingWordPath   = "/create_spelling_word"
+	CreateSpellingSetPath    = "/create_spelling_set"
+	ListSpellingWordsPath    = "/list_spelling_words"
+	ListSpellingSetsPath     = "/list_spelling_sets"
+	EditSpellingSetPath      = "/edit_spelling_set"
+	EditSpellingSetWordsPath = "/edit_spelling_set_words"
+)
+
 type Client interface {
-	GetUser(req GetUserRequest) (*User, error)
-	CreateUser(req CreateUserRequest) (*User, error)
-	EditUser(req EditUserRequest) (*User, error)
-	EditParentDetails(req EditParentDetailsRequest) (*User, error)
-	Login(req LoginRequest) (*User, error)
-	Logout(req LogoutRequest) error
+	CreateSpellingWord(ctx context.Context, req CreateSpellingWordRequest) (CreateSpellingWordResponse, error)
+	CreateSpellingSet(ctx context.Context, req CreateSpellingSetRequest) (CreateSpellingSetResponse, error)
 }
 
 type client struct {
 	internal *http.InternalClient
 }
 
-func NewFromEnv() *client {
+func New() *client {
 	cfg := http.InternalClientOptions{
-		Name:    "user",
+
 		Host:    "http://user",
 		Timeout: 5,
 	}
 
-	// config.LoadConfigItem("USER_CLIENT", &cfg)
+	/* s := http.Server{
+		Addr:         *bindAddress,      // configure the bind address
+		Handler:      sm,                // set the default handler
+		ErrorLog:     l,                 // set the logger for the server
+		ReadTimeout:  5 * time.Second,   // max time to read request from the client
+		WriteTimeout: 10 * time.Second,  // max time to write response to the client
+		IdleTimeout:  120 * time.Second, // max time for connections using TCP Keep-Alive
+	} */
 
-	return &client{
-		internal: http.NewInternalClient(cfg),
-	}
-}
-
-func (c *client) GetUser(ctx context, req GetUserRequest) (*GetUserResponse, error) {
-	res := &GetUserResponse{}
-	return res, c.internal.Do(ctx, "get_user", req, res)
-
-}
-
-func (c *client) CreateUser(ctx context, req CreateUserRequest) (*CreateUserResponse, error) {
-	res := &CreateUserResponse{}
-	return res, c.internal.Do(ctx, "create_user", req, res)
-}
-
-type EditUserRequest struct {
-	Username string `json:"username"`
-	Birthday string `json:"date_of_birth"`
-}
-
-type EditParentDetailsRequest struct {
-	user       uuid.UUID `json:"user,required"`
-	ParentCode string    `json:"parent_code"`
-}
-
-type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
+	return &client{internal: http.NewInternalClient(cfg)}
 }

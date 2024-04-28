@@ -1,40 +1,40 @@
 package api
 
 import (
-	"context"
-
-	"github.com/spf13/cobra"
-
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/database"
-	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/client"
-	userRepo "github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure"
-	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/internal/infrastructure/repo"
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/internal/app"
+	spellingRepo "github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/internal/infrastructure"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/internal/infrastructure/repo"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/internal/rpc"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/client"
+	"github.com/spf13/cobra"
+	"log"
 )
 
 var CMD = &cobra.Command{
 	Use:   "api",
-	Short: "User service implementation",
-	Long:  "User service implements complete management of a user",
+	Short: "Spelling service implementation",
+	Long:  "Spelling service implements complete management of a user",
 	RunE:  runE,
 }
+var logger log.Logger
 
-func RunE() {
-	ctx := context.Background()
-	db, err := database.New(ctx, "user")
+func runE(cmd *cobra.Command, _ []string) error {
+	db, err := database.New(&logger, "spelling")
+	if err != nil {
+		logger.Fatal("unable to create postgres client", err)
+	}
+
 	queries := repo.New(db)
-
-	repository := userRepo.NewRepo(queries)
+	repository := spellingRepo.NewRepo(*queries)
 	var (
 		a = app.New(repository)
 		r = rpc.New(a)
 	)
-	srv := gin.Default()
-	srv.GET(client.getUserPath, r.GetUser)
-	srv.POST(client.createUserPath, r.CreateUser)
-	srv.POST(client.loginPath, r.Login)
-	srv.POST(client.logoutPath, r.Logout)
-	srv.PUT(client.editUserPath, r.EditUser)
-	srv.PUT(client.editParentDetailsPath, r.EditParentDetails)
 
-	srv.Run(":8080")
+	router := shttp.New(cmd)
+	router.RegisterHandler(client.CreateSpellingWordPath, r.CreateSpellingWord)
+	router.RegisterHandler(client.CreateSpellingSetPath, r.CreateSpellingSet)
+	return router.Listen("8081")
 }

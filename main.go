@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/killable"
+	spelling "github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/cmd"
 	user "github.com/sabrina-djebbar/spelling-app-backend/srv/user/cmd"
 	"github.com/spf13/cobra"
 	"log"
@@ -13,7 +14,7 @@ var l = &log.Logger{}
 
 // https://www.youtube.com/watch?v=x_N2VjGQKr4
 var rootCMD = &cobra.Command{
-	Use:          "spelling",
+	Use:          "spelling  app",
 	Short:        "Spelling app is a monobinary for all our go services",
 	Long:         "",
 	SilenceUsage: true,
@@ -30,6 +31,7 @@ func init() {
 	// Load the services
 	rootCMD.AddCommand(
 		user.CMD,
+		spelling.CMD,
 	)
 }
 
@@ -43,6 +45,6 @@ func main() {
 		l.Fatal("an error occurred executing that command", "err_message", err.Error(), "err", err)
 		return
 	}
-	//	user.Main(l)
+	//spelling.Main(l)
 
 }
