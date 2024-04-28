@@ -6,7 +6,7 @@ import (
 )
 
 var CMD = &cobra.Command{
-	Use:   "scriteria",
+	Use:   "spelling",
 	Short: "",
 }
 
