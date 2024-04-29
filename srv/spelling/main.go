@@ -35,10 +35,9 @@ func main() {
 		words = []string{"aQke1e5VqmrEaFVi14N62WEFkN26jVAZ8gxpr9hq8pY_word"}
 	)
 	req := client.CreateSpellingSetRequest{
-		Name:           "people and relations",
-		RecommendedAge: 5,
-		Tags:           "people",
-		Words:          words,
+		Name:  "people and relations",
+		Tags:  "people,family,relations",
+		Words: words,
 	}
 	res, err := r.CreateSpellingSet(ctx, req)
 	if err != nil {

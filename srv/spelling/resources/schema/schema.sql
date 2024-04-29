@@ -14,7 +14,7 @@ ALTER TABLE spelling_word OWNER TO postgres;
 CREATE TABLE IF NOT EXISTS spelling_set (
 	id text PRIMARY KEY,
 	name text NOT NULL,
-	recommended_age int NOT NULL,
+	recommended_age text NOT NULL,
     description text,
     tags text,
     creator text NOT NULL,

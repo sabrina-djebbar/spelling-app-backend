@@ -22,18 +22,21 @@ func (a *app) CreateSpellingWord(ctx context.Context, req client.CreateSpellingW
 		Class:                models.Class(req.Class),
 		Difficulty:           difficulty,
 		TotalAvailablePoints: len(req.Spelling) + 1,
+		Tags:                 req.Tags,
 	}
+
 	word, err := a.repository.CreateSpellingWord(ctx, args)
 	if err != nil {
 		return nil, err
 	}
+
 	return &models.SpellingWord{
 		ID:                   word.ID,
 		Spelling:             word.Spelling,
 		Definition:           database.SQLNullStringToString(word.Definition),
 		Difficulty:           word.Difficulty,
 		Class:                models.Class(word.Class),
-		Tags:                 database.SQLNullStringToString(word.Tags),
+		Tags:                 FormatTagsStringToArray(database.SQLNullStringToString(word.Tags)),
 		TotalAvailablePoints: database.Int32ToInt(word.TotalAvailablePoints),
 	}, nil
 }

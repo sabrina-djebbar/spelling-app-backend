@@ -31,7 +31,7 @@ INSERT INTO spelling_set(id, name, recommended_age, description, tags, creator) 
 type CreateSpellingSetParams struct {
 	ID             string
 	Name           string
-	RecommendedAge int32
+	RecommendedAge string
 	Description    sql.NullString
 	Tags           sql.NullString
 	Creator        string
@@ -126,4 +126,99 @@ func (q *Queries) GetWordDifficulty(ctx context.Context, id string) (float64, er
 	var difficulty float64
 	err := row.Scan(&difficulty)
 	return difficulty, err
+}
+
+const listSetsByTags = `-- name: ListSetsByTags :many
+SELECT  ss.id AS set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
+        sw.id AS word_id, sw.spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
+FROM spelling_set ss JOIN spelling_set_words ssw ON ss.id = ssw.set_id JOIN spelling_word sw ON ssw.word_id = sw.id WHERE ss.tags LIKE ''%'' || $1 || ''%''
+`
+
+type ListSetsByTagsRow struct {
+	SetID                string
+	SetName              string
+	Description          sql.NullString
+	RecommendedAge       string
+	SetTags              sql.NullString
+	Creator              string
+	WordID               string
+	Spelling             string
+	Definition           sql.NullString
+	Difficulty           float64
+	TotalAvailablePoints int32
+	WordTags             sql.NullString
+	WordClass            string
+}
+
+func (q *Queries) ListSetsByTags(ctx context.Context, dollar_1 sql.NullString) ([]ListSetsByTagsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listSetsByTags, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSetsByTagsRow
+	for rows.Next() {
+		var i ListSetsByTagsRow
+		if err := rows.Scan(
+			&i.SetID,
+			&i.SetName,
+			&i.Description,
+			&i.RecommendedAge,
+			&i.SetTags,
+			&i.Creator,
+			&i.WordID,
+			&i.Spelling,
+			&i.Definition,
+			&i.Difficulty,
+			&i.TotalAvailablePoints,
+			&i.WordTags,
+			&i.WordClass,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listWordsByTags = `-- name: ListWordsByTags :many
+SELECT id, spelling, definition, class, tags, difficulty, total_available_points, created FROM spelling_word WHERE tags LIKE ''%'' || $1 || ''%''
+`
+
+func (q *Queries) ListWordsByTags(ctx context.Context, dollar_1 sql.NullString) ([]SpellingWord, error) {
+	rows, err := q.db.QueryContext(ctx, listWordsByTags, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SpellingWord
+	for rows.Next() {
+		var i SpellingWord
+		if err := rows.Scan(
+			&i.ID,
+			&i.Spelling,
+			&i.Definition,
+			&i.Class,
+			&i.Tags,
+			&i.Difficulty,
+			&i.TotalAvailablePoints,
+			&i.Created,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

@@ -23,7 +23,7 @@ type SpellingWord struct {
 	Class                Class     `json:"class"`
 	Difficulty           float64   `json:"difficulty"`
 	TotalAvailablePoints int       `json:"total_available_points"`
-	Tags                 string    `json:"tags"`
+	Tags                 []string  `json:"tags"`
 	Created              time.Time `json:"created"`
 }
 
@@ -31,9 +31,9 @@ type SpellingWord struct {
 type SpellingSet struct {
 	ID             string         `json:"id"`
 	Name           string         `json:"name"`
-	RecommendedAge int            `json:"recommended_age"`
+	RecommendedAge string         `json:"recommended_age"`
 	Description    string         `json:"description"`
-	Tags           string         `json:"tags"`
+	Tags           []string       `json:"tags"`
 	Words          []SpellingWord `json:"words"`
 }
 

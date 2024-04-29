@@ -1,0 +1,37 @@
+### create_word
+POST http://localhost:8081/create_spelling_word
+Content-Type: application/json
+
+{
+  "spelling": "mother",
+  "class": "Noun",
+  "tags": "people, relations",
+  "definition": "A female parent."
+}
+
+### login TODO: fix error logging
+POST http://localhost:8081/create_spelling_set
+Content-Type: application/json
+
+{
+  "name": "family and relations",
+  "description": "10 words relating to different family members",
+  "words": ["KbFyORUpKj48ziQpBsgj1tNzkFsCk6oP8UxGuCuIT6k_word","aQke1e5VqmrEaFVi14N62WEFkN26jVAZ8gxpr9hq8pY_word","COaDsZepgj7TzPB0BpNXmClBIida5ioY5XNxR2XhJbw_word"],
+  "tags": "family,relations,people"
+}
+
+### update_parent_code
+POST http://localhost:8081/list_spelling_sets
+Content-Type: application/json
+
+{
+  "tags": ["family", "people"]
+}
+
+### update_user
+POST http://localhost:8081/list_spelling_words
+Content-Type: application/json
+
+{
+  "tags": ["food", "animals"]
+}

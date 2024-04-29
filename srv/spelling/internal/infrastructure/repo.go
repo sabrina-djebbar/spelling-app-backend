@@ -9,6 +9,7 @@ import (
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/serr"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/internal/infrastructure/repo"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/models"
+	"strings"
 )
 
 type Repository struct {
@@ -25,6 +26,7 @@ type CreateSpellingWordParams struct {
 	Difficulty           float64
 	TotalAvailablePoints int
 	Class                models.Class
+	Tags                 string
 }
 
 func (r *Repository) CreateSpellingWord(ctx context.Context, args CreateSpellingWordParams) (*repo.SpellingWord, error) {
@@ -35,6 +37,7 @@ func (r *Repository) CreateSpellingWord(ctx context.Context, args CreateSpelling
 		Difficulty:           args.Difficulty,
 		Definition:           database.StringToSQLNullString(args.Definition),
 		TotalAvailablePoints: database.IntToInt32(args.TotalAvailablePoints),
+		Tags:                 database.StringToSQLNullString(args.Tags),
 	}
 
 	word, err := r.q.CreateSpellingWord(ctx, params)
@@ -48,8 +51,9 @@ func (r *Repository) CreateSpellingWord(ctx context.Context, args CreateSpelling
 type CreateSpellingSetParams struct {
 	Name           string
 	Description    string
-	RecommendedAge int
+	RecommendedAge string
 	Creator        string
+	Tags           string
 }
 
 func (r *Repository) CreateSpellingSet(ctx context.Context, args CreateSpellingSetParams) (*repo.SpellingSet, error) {
@@ -57,13 +61,14 @@ func (r *Repository) CreateSpellingSet(ctx context.Context, args CreateSpellingS
 		ID:             id.Generate("set"),
 		Name:           args.Name,
 		Description:    database.StringToSQLNullString(args.Description),
-		RecommendedAge: database.IntToInt32(args.RecommendedAge),
+		RecommendedAge: args.RecommendedAge,
 		Creator:        args.Creator,
+		Tags:           database.StringToSQLNullString(args.Tags),
 	}
 
 	set, err := r.q.CreateSpellingSet(ctx, params)
 	if err != nil {
-		return nil, serr.Wrap(err, serr.WithMessage("Unable to create scriteria set"))
+		return nil, serr.Wrap(err, serr.WithMessage("Unable to create spelling set"))
 	}
 	return &set, nil
 }
@@ -96,4 +101,53 @@ func (r *Repository) GetSpellingWordDifficulty(ctx context.Context, wordID strin
 		return 0, serr.Wrap(err, serr.WithMessage("Unable to get word difficulty"))
 	}
 	return difficulty, nil
+}
+
+type ListSetsByTagRes struct {
+	ID             string
+	Name           string
+	RecommendedAge string
+	Description    string
+	Tags           string
+	Creator        string
+	Words          []models.SpellingWord
+}
+
+func (r *Repository) ListSetsByTags(ctx context.Context, tags []string) ([]ListSetsByTagRes, error) {
+	spellingSets := make([]ListSetsByTagRes, 0)
+	for _, tag := range tags {
+		sets, err := r.q.ListSetsByTags(ctx, database.StringToSQLNullString(tag))
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return nil, serr.Wrap(err, serr.WithMessage("No sets found with tag: "+tag))
+			}
+			return nil, serr.Wrap(err, serr.WithMessage("Unable to list sets with tag: "+tag))
+		}
+		for setID, set := range sets {
+			spellingSets = append(spellingSets, ListSetsByTagRes{
+				ID:             set.SetID,
+				Name:           set.SetName,
+				RecommendedAge: set.RecommendedAge,
+				Description:    database.SQLNullStringToString(set.Description),
+				Tags:           database.SQLNullStringToString(set.SetTags),
+				Creator:        set.Creator,
+			})
+
+			spellingSets[setID].Words = append(spellingSets[setID].Words, models.SpellingWord{
+				ID:                   set.WordID,
+				Spelling:             set.Spelling,
+				Definition:           database.SQLNullStringToString(set.Definition),
+				Class:                models.Class(set.WordClass),
+				Difficulty:           set.Difficulty,
+				TotalAvailablePoints: database.Int32ToInt(set.TotalAvailablePoints),
+				Tags:                 FormatTagsStringToArray(database.SQLNullStringToString(set.WordTags)),
+			})
+		}
+	}
+	return spellingSets, nil
+}
+
+func FormatTagsStringToArray(spelling string) []string {
+	spelling = strings.ReplaceAll(spelling, " ", "")
+	return strings.Split(spelling, ",")
 }

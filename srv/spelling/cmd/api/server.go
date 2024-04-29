@@ -36,5 +36,6 @@ func runE(cmd *cobra.Command, _ []string) error {
 	router := shttp.New(cmd)
 	router.RegisterHandler(client.CreateSpellingWordPath, r.CreateSpellingWord)
 	router.RegisterHandler(client.CreateSpellingSetPath, r.CreateSpellingSet)
+	router.RegisterHandler(client.ListSpellingSetsPath, r.ListSpellingSets)
 	return router.Listen("8081")
 }

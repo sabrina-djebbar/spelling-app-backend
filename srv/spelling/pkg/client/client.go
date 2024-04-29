@@ -17,6 +17,7 @@ const (
 type Client interface {
 	CreateSpellingWord(ctx context.Context, req CreateSpellingWordRequest) (CreateSpellingWordResponse, error)
 	CreateSpellingSet(ctx context.Context, req CreateSpellingSetRequest) (CreateSpellingSetResponse, error)
+	ListSpellingSets(ctx context.Context, req ListSpellingSetsRequest) (ListSpellingSetResponse, error)
 }
 
 type client struct {

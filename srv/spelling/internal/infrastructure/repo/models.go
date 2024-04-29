@@ -22,7 +22,7 @@ type SpellingExercise struct {
 type SpellingSet struct {
 	ID             string
 	Name           string
-	RecommendedAge int32
+	RecommendedAge string
 	Description    sql.NullString
 	Tags           sql.NullString
 	Creator        string
