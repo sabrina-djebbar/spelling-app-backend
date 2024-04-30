@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"github.com/jackc/pgx/v5"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/database"
@@ -140,7 +141,7 @@ func (r *Repository) ListSetsByTags(ctx context.Context, tags []string) ([]ListS
 				Class:                models.Class(set.WordClass),
 				Difficulty:           set.Difficulty,
 				TotalAvailablePoints: database.Int32ToInt(set.TotalAvailablePoints),
-				Tags:                 FormatTagsStringToArray(database.SQLNullStringToString(set.WordTags)),
+				Tags:                 FormatNullStringTags(set.WordTags),
 			})
 		}
 	}
@@ -150,4 +151,9 @@ func (r *Repository) ListSetsByTags(ctx context.Context, tags []string) ([]ListS
 func FormatTagsStringToArray(spelling string) []string {
 	spelling = strings.ReplaceAll(spelling, " ", "")
 	return strings.Split(spelling, ",")
+}
+
+func FormatNullStringTags(tags sql.NullString) []string {
+	newTags := strings.ReplaceAll(database.SQLNullStringToString(tags), " ", "")
+	return strings.Split(newTags, ",")
 }

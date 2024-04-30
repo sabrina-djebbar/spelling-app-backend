@@ -6,12 +6,14 @@ import (
 )
 
 const (
-	CreateSpellingWordPath   = "/create_spelling_word"
-	CreateSpellingSetPath    = "/create_spelling_set"
-	ListSpellingWordsPath    = "/list_spelling_words"
-	ListSpellingSetsPath     = "/list_spelling_sets"
-	EditSpellingSetPath      = "/edit_spelling_set"
-	EditSpellingSetWordsPath = "/edit_spelling_set_words"
+	CreateSpellingWordPath         = "/create_spelling_word"
+	CreateSpellingSetPath          = "/create_spelling_set"
+	ListSpellingWordsPath          = "/list_spelling_words"
+	ListSpellingSetsPath           = "/list_spelling_sets"
+	EditSpellingSetPath            = "/edit_spelling_set"
+	EditSpellingSetWordsPath       = "/edit_spelling_set_words"
+	CreateSpellingAttemptPath      = "/create_spelling_attempt"
+	ListSpellingExerciseByUserPath = "/list_spelling_exercise_by_user"
 )
 
 type Client interface {

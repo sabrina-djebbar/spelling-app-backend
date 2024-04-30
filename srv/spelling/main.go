@@ -30,18 +30,18 @@ func main() {
 	queries := repo.New(db)
 	repository := spellingRepo.NewRepo(*queries)
 	var (
-		a     = app.New(repository)
-		r     = rpc.New(a)
-		words = []string{"aQke1e5VqmrEaFVi14N62WEFkN26jVAZ8gxpr9hq8pY_word"}
+		a = app.New(repository)
+		r = rpc.New(a)
+		// words = []string{"aQke1e5VqmrEaFVi14N62WEFkN26jVAZ8gxpr9hq8pY_word"}
 	)
-	req := client.CreateSpellingSetRequest{
-		Name:  "people and relations",
-		Tags:  "people,family,relations",
-		Words: words,
+	req := client.ListSpellingExercisesByUserRequest{
+		UserID: "VVllNSUIGg03MrmrDWW52fJszDi9ITS2Ly6uWp5Okdc_user",
 	}
-	res, err := r.CreateSpellingSet(ctx, req)
+	res, err := r.ListSpellingExerciseByUser(ctx, req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Word Created: %v\n", res.SpellingSet)
+	for _, e := range res.Exercises {
+		fmt.Println(e)
+	}
 }

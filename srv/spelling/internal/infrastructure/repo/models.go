@@ -14,6 +14,7 @@ type SpellingExercise struct {
 	UserID        string
 	SetID         string
 	WordID        string
+	Spelling      string
 	Score         float64
 	NumOfAttempts int32
 	LastAttempt   time.Time

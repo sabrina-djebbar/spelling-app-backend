@@ -12,6 +12,8 @@ type App interface {
 	CreateSpellingWord(ctx context.Context, req client.CreateSpellingWordRequest) (*models.SpellingWord, error)
 	CreateSpellingSet(ctx context.Context, req client.CreateSpellingSetRequest) (*models.SpellingSet, error)
 	ListSpellingSets(ctx context.Context, req client.ListSpellingSetsRequest) ([]models.SpellingSet, error)
+	ListSpellingExercisesByUser(ctx context.Context, req client.ListSpellingExercisesByUserRequest) ([]models.SpellingExercise, error)
+	CreateSpellingAttempt(ctx context.Context, req client.CreateSpellingAttemptRequest) (string, error)
 }
 
 type app struct {

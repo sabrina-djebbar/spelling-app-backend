@@ -8,7 +8,48 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"time"
 )
+
+const addSpellingAttempt = `-- name: AddSpellingAttempt :one
+INSERT INTO spelling_exercise (id, user_id, set_id, word_id,spelling, score, num_of_attempts,last_attempt) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id, user_id, set_id, word_id, spelling, score, num_of_attempts, last_attempt
+`
+
+type AddSpellingAttemptParams struct {
+	ID            string
+	UserID        string
+	SetID         string
+	WordID        string
+	Spelling      string
+	Score         float64
+	NumOfAttempts int32
+	LastAttempt   time.Time
+}
+
+func (q *Queries) AddSpellingAttempt(ctx context.Context, arg AddSpellingAttemptParams) (SpellingExercise, error) {
+	row := q.db.QueryRowContext(ctx, addSpellingAttempt,
+		arg.ID,
+		arg.UserID,
+		arg.SetID,
+		arg.WordID,
+		arg.Spelling,
+		arg.Score,
+		arg.NumOfAttempts,
+		arg.LastAttempt,
+	)
+	var i SpellingExercise
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.SetID,
+		&i.WordID,
+		&i.Spelling,
+		&i.Score,
+		&i.NumOfAttempts,
+		&i.LastAttempt,
+	)
+	return i, err
+}
 
 const addWordToSet = `-- name: AddWordToSet :exec
 INSERT INTO spelling_set_words(set_id, word_id) VALUES ($1, $2)
@@ -95,6 +136,153 @@ func (q *Queries) CreateSpellingWord(ctx context.Context, arg CreateSpellingWord
 		&i.Created,
 	)
 	return i, err
+}
+
+const getSpellingExerciseAttemptByID = `-- name: GetSpellingExerciseAttemptByID :many
+SELECT se.id, user_id, set_id, word_id, se.spelling, score, num_of_attempts, last_attempt, ss.id, name, recommended_age, description, ss.tags, creator, ss.created, sw.id, sw.spelling, definition, class, sw.tags, difficulty, total_available_points, sw.created FROM spelling_exercise se JOIN spelling_set ss ON se.set_id = ss.id JOIN spelling_word sw ON se.word_id = sw.id WHERE se.id = $1
+`
+
+type GetSpellingExerciseAttemptByIDRow struct {
+	ID                   string
+	UserID               string
+	SetID                string
+	WordID               string
+	Spelling             string
+	Score                float64
+	NumOfAttempts        int32
+	LastAttempt          time.Time
+	ID_2                 string
+	Name                 string
+	RecommendedAge       string
+	Description          sql.NullString
+	Tags                 sql.NullString
+	Creator              string
+	Created              sql.NullTime
+	ID_3                 string
+	Spelling_2           string
+	Definition           sql.NullString
+	Class                string
+	Tags_2               sql.NullString
+	Difficulty           float64
+	TotalAvailablePoints int32
+	Created_2            sql.NullTime
+}
+
+func (q *Queries) GetSpellingExerciseAttemptByID(ctx context.Context, id string) ([]GetSpellingExerciseAttemptByIDRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSpellingExerciseAttemptByID, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSpellingExerciseAttemptByIDRow
+	for rows.Next() {
+		var i GetSpellingExerciseAttemptByIDRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.SetID,
+			&i.WordID,
+			&i.Spelling,
+			&i.Score,
+			&i.NumOfAttempts,
+			&i.LastAttempt,
+			&i.ID_2,
+			&i.Name,
+			&i.RecommendedAge,
+			&i.Description,
+			&i.Tags,
+			&i.Creator,
+			&i.Created,
+			&i.ID_3,
+			&i.Spelling_2,
+			&i.Definition,
+			&i.Class,
+			&i.Tags_2,
+			&i.Difficulty,
+			&i.TotalAvailablePoints,
+			&i.Created_2,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getSpellingExerciseAttemptByUser = `-- name: GetSpellingExerciseAttemptByUser :many
+SELECT se.id as exercise_id,se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
+       sw.id AS word_id, sw.spelling as correct_spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class FROM spelling_exercise se JOIN spelling_set ss ON se.set_id = ss.id JOIN spelling_word sw ON se.word_id = sw.id WHERE se.user_id = $1
+`
+
+type GetSpellingExerciseAttemptByUserRow struct {
+	ExerciseID           string
+	UserID               string
+	SpellingAttempt      string
+	LastAttempt          time.Time
+	NumOfAttempts        int32
+	Score                float64
+	SetID                string
+	SetName              string
+	Description          sql.NullString
+	RecommendedAge       string
+	SetTags              sql.NullString
+	Creator              string
+	WordID               string
+	CorrectSpelling      string
+	Definition           sql.NullString
+	Difficulty           float64
+	TotalAvailablePoints int32
+	WordTags             sql.NullString
+	WordClass            string
+}
+
+func (q *Queries) GetSpellingExerciseAttemptByUser(ctx context.Context, userID string) ([]GetSpellingExerciseAttemptByUserRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSpellingExerciseAttemptByUser, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSpellingExerciseAttemptByUserRow
+	for rows.Next() {
+		var i GetSpellingExerciseAttemptByUserRow
+		if err := rows.Scan(
+			&i.ExerciseID,
+			&i.UserID,
+			&i.SpellingAttempt,
+			&i.LastAttempt,
+			&i.NumOfAttempts,
+			&i.Score,
+			&i.SetID,
+			&i.SetName,
+			&i.Description,
+			&i.RecommendedAge,
+			&i.SetTags,
+			&i.Creator,
+			&i.WordID,
+			&i.CorrectSpelling,
+			&i.Definition,
+			&i.Difficulty,
+			&i.TotalAvailablePoints,
+			&i.WordTags,
+			&i.WordClass,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getSpellingWord = `-- name: GetSpellingWord :one
@@ -188,7 +376,7 @@ func (q *Queries) ListSetsByTags(ctx context.Context, dollar_1 sql.NullString) (
 }
 
 const listWordsByTags = `-- name: ListWordsByTags :many
-SELECT id, spelling, definition, class, tags, difficulty, total_available_points, created FROM spelling_word WHERE tags LIKE ''%'' || $1 || ''%''
+SELECT id, spelling, definition, class, tags, difficulty, total_available_points, created FROM spelling_word WHERE tags LIKE  '%' || $1 || '%'
 `
 
 func (q *Queries) ListWordsByTags(ctx context.Context, dollar_1 sql.NullString) ([]SpellingWord, error) {

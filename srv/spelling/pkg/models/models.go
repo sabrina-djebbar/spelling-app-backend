@@ -38,12 +38,28 @@ type SpellingSet struct {
 }
 
 // SpellingExercise represents the spelling_exercise table
-type SpellingExercise struct {
+type SpellingExerciseV0 struct {
 	ID            string    `json:"id"`
 	UserID        string    `json:"user_id"`
 	SetID         string    `json:"set_id"`
 	WordID        string    `json:"word_id"`
+	Spelling      string    `json:"spelling"`
 	Score         float64   `json:"score"`
 	NumOfAttempts int       `json:"num_of_attempts"`
 	LastAttempt   time.Time `json:"last_attempt"`
+}
+
+type SpellingExercise struct {
+	ID     string            `json:"id"`
+	UserID string            `json:"user_id"`
+	Set    SpellingSet       `json:"set"`
+	Word   []SpellingAttempt `json:"word_attempts"`
+}
+
+type SpellingAttempt struct {
+	Word          SpellingWord `json:"word"`
+	Spelling      string       `json:"spelling"`
+	Score         float64      `json:"score"`
+	NumOfAttempts int          `json:"num_of_attempts"`
+	LastAttempt   time.Time    `json:"last_attempt"`
 }

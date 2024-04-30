@@ -33,15 +33,17 @@ CREATE TABLE IF NOT EXISTS spelling_set_words (
 ALTER TABLE spelling_set_words OWNER TO postgres;
 
 CREATE TABLE IF NOT EXISTS spelling_exercise (
-    id text PRIMARY KEY,
+    id text,
     user_id text NOT NULL,
     set_id text NOT NULL,
     word_id text NOT NULL,
+    spelling text NOT NULL,
     score double precision NOT NULL,
     num_of_attempts int NOT NULL,
     last_attempt date NOT NULL,
     FOREIGN KEY (word_id) REFERENCES spelling_word(id),
-    FOREIGN KEY (set_id) REFERENCES spelling_set(id)
+    FOREIGN KEY (set_id) REFERENCES spelling_set(id),
+    PRIMARY KEY (word_id, id)
 );
 
 ALTER TABLE spelling_exercise OWNER TO postgres;
