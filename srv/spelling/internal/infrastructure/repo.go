@@ -111,20 +111,20 @@ type ListSetsByTagRes struct {
 	Description    string
 	Tags           string
 	Creator        string
-	Words          []models.SpellingWord
+	Word           models.SpellingWord
 }
 
 func (r *Repository) ListSetsByTags(ctx context.Context, tags []string) ([]ListSetsByTagRes, error) {
 	spellingSets := make([]ListSetsByTagRes, 0)
 	for _, tag := range tags {
-		sets, err := r.q.ListSetsByTags(ctx, database.StringToSQLNullString(tag))
+		sets, err := r.q.ListSetsByTags(ctx, database.StringToSQLNullString(strings.TrimSpace(tag)))
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
 				return nil, serr.Wrap(err, serr.WithMessage("No sets found with tag: "+tag))
 			}
 			return nil, serr.Wrap(err, serr.WithMessage("Unable to list sets with tag: "+tag))
 		}
-		for setID, set := range sets {
+		for _, set := range sets {
 			spellingSets = append(spellingSets, ListSetsByTagRes{
 				ID:             set.SetID,
 				Name:           set.SetName,
@@ -132,17 +132,17 @@ func (r *Repository) ListSetsByTags(ctx context.Context, tags []string) ([]ListS
 				Description:    database.SQLNullStringToString(set.Description),
 				Tags:           database.SQLNullStringToString(set.SetTags),
 				Creator:        set.Creator,
+				Word: models.SpellingWord{
+					ID:                   set.WordID,
+					Spelling:             set.Spelling,
+					Definition:           database.SQLNullStringToString(set.Definition),
+					Class:                models.Class(set.WordClass),
+					Difficulty:           set.Difficulty,
+					TotalAvailablePoints: database.Int32ToInt(set.TotalAvailablePoints),
+					Tags:                 FormatNullStringTags(set.WordTags),
+				},
 			})
 
-			spellingSets[setID].Words = append(spellingSets[setID].Words, models.SpellingWord{
-				ID:                   set.WordID,
-				Spelling:             set.Spelling,
-				Definition:           database.SQLNullStringToString(set.Definition),
-				Class:                models.Class(set.WordClass),
-				Difficulty:           set.Difficulty,
-				TotalAvailablePoints: database.Int32ToInt(set.TotalAvailablePoints),
-				Tags:                 FormatNullStringTags(set.WordTags),
-			})
 		}
 	}
 	return spellingSets, nil

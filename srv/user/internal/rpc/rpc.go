@@ -9,7 +9,7 @@ import (
 type RPC interface {
 	GetUser(ctx context.Context, req client.GetUserRequest) (*client.GetUserResponse, error)
 	CreateUser(ctx context.Context, req client.CreateUserRequest) (*client.CreateUserResponse, error)
-	ListUser(ctx context.Context) (*client.ListUsersResponse, error)
+	ListUser(ctx context.Context, req client.ListUsersRequest) (*client.ListUsersResponse, error)
 	Login(ctx context.Context, req client.LoginRequest) (*client.LoginResponse, error)
 	EditParentCode(ctx context.Context, req client.EditParentCodeRequest) (*client.EditParentCodeResponse, error)
 	EditUser(ctx context.Context, req client.EditUserRequest) (*client.EditUserResponse, error)

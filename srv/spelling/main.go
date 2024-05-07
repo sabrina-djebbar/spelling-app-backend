@@ -34,14 +34,14 @@ func main() {
 		r = rpc.New(a)
 		// words = []string{"aQke1e5VqmrEaFVi14N62WEFkN26jVAZ8gxpr9hq8pY_word"}
 	)
-	req := client.ListSpellingExercisesByUserRequest{
-		UserID: "VVllNSUIGg03MrmrDWW52fJszDi9ITS2Ly6uWp5Okdc_user",
+	req := client.ListSpellingSetsRequest{
+		Tags: []string{"family", "animals"},
 	}
-	res, err := r.ListSpellingExerciseByUser(ctx, req)
+	res, err := r.ListSpellingSets(ctx, req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, e := range res.Exercises {
+	for _, e := range res.Sets {
 		fmt.Println(e)
 	}
 }

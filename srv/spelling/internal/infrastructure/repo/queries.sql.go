@@ -319,7 +319,7 @@ func (q *Queries) GetWordDifficulty(ctx context.Context, id string) (float64, er
 const listSetsByTags = `-- name: ListSetsByTags :many
 SELECT  ss.id AS set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
         sw.id AS word_id, sw.spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
-FROM spelling_set ss JOIN spelling_set_words ssw ON ss.id = ssw.set_id JOIN spelling_word sw ON ssw.word_id = sw.id WHERE ss.tags LIKE ''%'' || $1 || ''%''
+FROM spelling_set ss JOIN spelling_set_words ssw ON ss.id = ssw.set_id JOIN spelling_word sw ON ssw.word_id = sw.id WHERE ss.tags LIKE '%' || $1 || '%'
 `
 
 type ListSetsByTagsRow struct {

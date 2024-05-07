@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/id"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/middleware"
@@ -35,6 +36,13 @@ func New(cmd *cobra.Command) HTTPServer {
 	router.GET(HealthPath, func(ctx *gin.Context) { ctx.JSON(200, gin.H{"ready": "ok"}) })
 
 	router.Use(NewServiceIdentityMiddleware(cmd))
+	// Use the cors middleware here
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:  []string{"http://localhost:3000"}, // Replace with your frontend URL
+		AllowMethods:  []string{"GET", "POST"},
+		AllowHeaders:  []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		ExposeHeaders: []string{"Content-Length", "Content-Type", "X-Request-ID", "X-Served-By", "X-Served-Date"},
+	}))
 	return &server{router: router}
 }
 
@@ -80,11 +88,13 @@ func NewServiceIdentityMiddleware(cmd *cobra.Command) gin.HandlerFunc {
 			ctx.Set("http_request_identifier", requestID)
 		}
 		ctx.Header("X-Request-ID", requestID)
-
 		if ServedBy != "" {
 			ctx.Header("X-ServedBy", ServedBy)
 		}
-
+		ctx.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		ctx.Header("Access-Control-Allow-Methods", "POST")
+		ctx.Header("Access-Control-Allow-Headers", "Content-Type")
+		ctx.Header("Access-Control-Expose-Headers", "Content-Encoding")
 		ctx.Header("X-Served-Date", time.Now().UTC().Format(time.RFC3339))
 		ctx.Next()
 	}

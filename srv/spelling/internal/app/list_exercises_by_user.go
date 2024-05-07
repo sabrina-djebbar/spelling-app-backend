@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/client"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/models"
 )
@@ -17,11 +16,9 @@ func (a *app) ListSpellingExercisesByUser(ctx context.Context, req client.ListSp
 	for _, exercise := range exercises {
 		index, ok := exerciseMap[exercise.ID]
 		if ok {
-			fmt.Println("exercise found")
 			// If exercise ID is found in map, append the attempt to existing SpellingExercise
 			spellingExercises[index].Word = append(spellingExercises[index].Word, exercise.Attempt)
 		} else {
-			fmt.Println("new exercise")
 			// If exercise ID is not found in map, create a new SpellingExercise
 			exerciseMap[exercise.ID] = len(spellingExercises)
 			spellingExercises = append(
