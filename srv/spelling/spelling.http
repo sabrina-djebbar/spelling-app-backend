@@ -20,7 +20,7 @@ Content-Type: application/json
   "tags": "animals"
 }
 
-### update_parent_code
+### list_spelling_sets
 POST http://localhost:8081/list_spelling_sets
 Content-Type: application/json
 
@@ -51,8 +51,8 @@ Content-Type: application/json
   "user_id": "VVllNSUIGg03MrmrDWW52fJszDi9ITS2Ly6uWp5Okdc_user",
   "set_id": "8UbqpeH79u2rrMO8T7s9OVvAZVxj3glgmzVT4I7hv5w_set",
   "word_id": "aQke1e5VqmrEaFVi14N62WEFkN26jVAZ8gxpr9hq8pY_word",
-  "spelling": "freind",
-  "score": 5,
+  "spelling": "friend",
+  "score": 7,
   "num_of_attempts": 3,
   "last_attempt": "2024-04-30T12:00:00Z"
 }

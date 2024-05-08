@@ -7,9 +7,10 @@ import (
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/id"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/internal/infrastructure/repo"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/client"
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/models"
 )
 
-func (a *app) CreateSpellingAttempt(ctx context.Context, req client.CreateSpellingAttemptRequest) (string, error) {
+func (a *app) CreateSpellingAttempt(ctx context.Context, req client.CreateSpellingAttemptRequest) (*models.SpellingExercise, error) {
 	if req.AttemptID == "" {
 		fmt.Println("AttemptID " + req.AttemptID + " will be generated")
 		req.AttemptID = id.Generate("exercise")
@@ -24,7 +25,14 @@ func (a *app) CreateSpellingAttempt(ctx context.Context, req client.CreateSpelli
 		LastAttempt:   req.LastAttempt,
 	})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return attempt.ID, nil
+	return &models.SpellingExercise{
+		ID:     attempt.ID,
+		UserID: attempt.UserID,
+		Set:    attempt.Set,
+		Word: []models.SpellingAttempt{
+			attempt.Attempt,
+		},
+	}, nil
 }

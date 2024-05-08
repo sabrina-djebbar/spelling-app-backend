@@ -1,6 +1,9 @@
 package client
 
-import "time"
+import (
+	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/models"
+	"time"
+)
 
 type CreateSpellingAttemptRequest struct {
 	AttemptID     string    `json:"attempt_id,omitempty"`
@@ -14,5 +17,5 @@ type CreateSpellingAttemptRequest struct {
 }
 
 type CreateSpellingAttemptResponse struct {
-	ID string `json:"id"`
+	Attempt *models.SpellingExercise `json:"attempt"`
 }

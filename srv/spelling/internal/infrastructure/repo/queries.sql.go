@@ -12,7 +12,16 @@ import (
 )
 
 const addSpellingAttempt = `-- name: AddSpellingAttempt :one
-INSERT INTO spelling_exercise (id, user_id, set_id, word_id,spelling, score, num_of_attempts,last_attempt) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id, user_id, set_id, word_id, spelling, score, num_of_attempts, last_attempt
+WITH se AS (
+    INSERT INTO spelling_exercise (id, user_id, set_id, word_id, spelling, score, num_of_attempts, last_attempt)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING id, user_id, set_id, word_id, spelling, score, num_of_attempts, last_attempt
+)
+SELECT se.id as exercise_id,se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
+    sw.id AS word_id, sw.spelling as correct_spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
+FROM  se
+         JOIN spelling_word sw ON se.word_id = sw.id
+         JOIN spelling_set ss ON se.set_id = ss.id
 `
 
 type AddSpellingAttemptParams struct {
@@ -26,8 +35,81 @@ type AddSpellingAttemptParams struct {
 	LastAttempt   time.Time
 }
 
-func (q *Queries) AddSpellingAttempt(ctx context.Context, arg AddSpellingAttemptParams) (SpellingExercise, error) {
+type AddSpellingAttemptRow struct {
+	ExerciseID           string
+	UserID               string
+	SpellingAttempt      string
+	LastAttempt          time.Time
+	NumOfAttempts        int32
+	Score                float64
+	SetID                string
+	SetName              string
+	Description          sql.NullString
+	RecommendedAge       string
+	SetTags              sql.NullString
+	Creator              string
+	WordID               string
+	CorrectSpelling      string
+	Definition           sql.NullString
+	Difficulty           float64
+	TotalAvailablePoints int32
+	WordTags             sql.NullString
+	WordClass            string
+}
+
+func (q *Queries) AddSpellingAttempt(ctx context.Context, arg AddSpellingAttemptParams) (AddSpellingAttemptRow, error) {
 	row := q.db.QueryRowContext(ctx, addSpellingAttempt,
+		arg.ID,
+		arg.UserID,
+		arg.SetID,
+		arg.WordID,
+		arg.Spelling,
+		arg.Score,
+		arg.NumOfAttempts,
+		arg.LastAttempt,
+	)
+	var i AddSpellingAttemptRow
+	err := row.Scan(
+		&i.ExerciseID,
+		&i.UserID,
+		&i.SpellingAttempt,
+		&i.LastAttempt,
+		&i.NumOfAttempts,
+		&i.Score,
+		&i.SetID,
+		&i.SetName,
+		&i.Description,
+		&i.RecommendedAge,
+		&i.SetTags,
+		&i.Creator,
+		&i.WordID,
+		&i.CorrectSpelling,
+		&i.Definition,
+		&i.Difficulty,
+		&i.TotalAvailablePoints,
+		&i.WordTags,
+		&i.WordClass,
+	)
+	return i, err
+}
+
+const addSpellingAttemptV0 = `-- name: AddSpellingAttemptV0 :one
+INSERT INTO spelling_exercise (id, user_id, set_id, word_id,spelling, score, num_of_attempts,last_attempt) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id, user_id, set_id, word_id, spelling, score, num_of_attempts, last_attempt
+`
+
+type AddSpellingAttemptV0Params struct {
+	ID            string
+	UserID        string
+	SetID         string
+	WordID        string
+	Spelling      string
+	Score         float64
+	NumOfAttempts int32
+	LastAttempt   time.Time
+}
+
+func (q *Queries) AddSpellingAttemptV0(ctx context.Context, arg AddSpellingAttemptV0Params) (SpellingExercise, error) {
+	row := q.db.QueryRowContext(ctx, addSpellingAttemptV0,
 		arg.ID,
 		arg.UserID,
 		arg.SetID,
@@ -138,81 +220,58 @@ func (q *Queries) CreateSpellingWord(ctx context.Context, arg CreateSpellingWord
 	return i, err
 }
 
-const getSpellingExerciseAttemptByID = `-- name: GetSpellingExerciseAttemptByID :many
-SELECT se.id, user_id, set_id, word_id, se.spelling, score, num_of_attempts, last_attempt, ss.id, name, recommended_age, description, ss.tags, creator, ss.created, sw.id, sw.spelling, definition, class, sw.tags, difficulty, total_available_points, sw.created FROM spelling_exercise se JOIN spelling_set ss ON se.set_id = ss.id JOIN spelling_word sw ON se.word_id = sw.id WHERE se.id = $1
+const getSpellingExerciseAttemptByID = `-- name: GetSpellingExerciseAttemptByID :one
+SELECT se.id as exercise_id,se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
+       sw.id AS word_id, sw.spelling as correct_spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class FROM spelling_exercise se JOIN spelling_set ss ON se.set_id = ss.id JOIN spelling_word sw ON se.word_id = sw.id WHERE se.id = $1
 `
 
 type GetSpellingExerciseAttemptByIDRow struct {
-	ID                   string
+	ExerciseID           string
 	UserID               string
-	SetID                string
-	WordID               string
-	Spelling             string
-	Score                float64
-	NumOfAttempts        int32
+	SpellingAttempt      string
 	LastAttempt          time.Time
-	ID_2                 string
-	Name                 string
-	RecommendedAge       string
+	NumOfAttempts        int32
+	Score                float64
+	SetID                string
+	SetName              string
 	Description          sql.NullString
-	Tags                 sql.NullString
+	RecommendedAge       string
+	SetTags              sql.NullString
 	Creator              string
-	Created              sql.NullTime
-	ID_3                 string
-	Spelling_2           string
+	WordID               string
+	CorrectSpelling      string
 	Definition           sql.NullString
-	Class                string
-	Tags_2               sql.NullString
 	Difficulty           float64
 	TotalAvailablePoints int32
-	Created_2            sql.NullTime
+	WordTags             sql.NullString
+	WordClass            string
 }
 
-func (q *Queries) GetSpellingExerciseAttemptByID(ctx context.Context, id string) ([]GetSpellingExerciseAttemptByIDRow, error) {
-	rows, err := q.db.QueryContext(ctx, getSpellingExerciseAttemptByID, id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetSpellingExerciseAttemptByIDRow
-	for rows.Next() {
-		var i GetSpellingExerciseAttemptByIDRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.UserID,
-			&i.SetID,
-			&i.WordID,
-			&i.Spelling,
-			&i.Score,
-			&i.NumOfAttempts,
-			&i.LastAttempt,
-			&i.ID_2,
-			&i.Name,
-			&i.RecommendedAge,
-			&i.Description,
-			&i.Tags,
-			&i.Creator,
-			&i.Created,
-			&i.ID_3,
-			&i.Spelling_2,
-			&i.Definition,
-			&i.Class,
-			&i.Tags_2,
-			&i.Difficulty,
-			&i.TotalAvailablePoints,
-			&i.Created_2,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetSpellingExerciseAttemptByID(ctx context.Context, id string) (GetSpellingExerciseAttemptByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getSpellingExerciseAttemptByID, id)
+	var i GetSpellingExerciseAttemptByIDRow
+	err := row.Scan(
+		&i.ExerciseID,
+		&i.UserID,
+		&i.SpellingAttempt,
+		&i.LastAttempt,
+		&i.NumOfAttempts,
+		&i.Score,
+		&i.SetID,
+		&i.SetName,
+		&i.Description,
+		&i.RecommendedAge,
+		&i.SetTags,
+		&i.Creator,
+		&i.WordID,
+		&i.CorrectSpelling,
+		&i.Definition,
+		&i.Difficulty,
+		&i.TotalAvailablePoints,
+		&i.WordTags,
+		&i.WordClass,
+	)
+	return i, err
 }
 
 const getSpellingExerciseAttemptByUser = `-- name: GetSpellingExerciseAttemptByUser :many

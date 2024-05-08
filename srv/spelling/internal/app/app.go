@@ -13,7 +13,7 @@ type App interface {
 	CreateSpellingSet(ctx context.Context, req client.CreateSpellingSetRequest) (*models.SpellingSet, error)
 	ListSpellingSets(ctx context.Context, req client.ListSpellingSetsRequest) ([]models.SpellingSet, error)
 	ListSpellingExercisesByUser(ctx context.Context, req client.ListSpellingExercisesByUserRequest) ([]models.SpellingExercise, error)
-	CreateSpellingAttempt(ctx context.Context, req client.CreateSpellingAttemptRequest) (string, error)
+	CreateSpellingAttempt(ctx context.Context, req client.CreateSpellingAttemptRequest) (*models.SpellingExercise, error)
 }
 
 type app struct {

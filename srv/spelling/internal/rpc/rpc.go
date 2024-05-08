@@ -18,14 +18,6 @@ type rpc struct {
 	app app.App
 }
 
-func (r rpc) ListSpellingExerciseByUser(ctx context.Context, req client.ListSpellingExercisesByUserRequest) (*client.ListSpellingExercisesByUserResponse, error) {
-	res, err := r.app.ListSpellingExercisesByUser(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	return &client.ListSpellingExercisesByUserResponse{Exercises: res}, nil
-}
-
 func New(app app.App) RPC {
 	return &rpc{
 		app,

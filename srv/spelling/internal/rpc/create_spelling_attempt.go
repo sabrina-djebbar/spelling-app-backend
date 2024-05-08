@@ -10,5 +10,5 @@ func (r rpc) CreateSpellingAttempt(ctx context.Context, req client.CreateSpellin
 	if err != nil {
 		return nil, err
 	}
-	return &client.CreateSpellingAttemptResponse{ID: res}, nil
+	return &client.CreateSpellingAttemptResponse{Attempt: res}, nil
 }
