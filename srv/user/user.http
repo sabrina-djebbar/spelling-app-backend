@@ -54,7 +54,7 @@ Content-Type: application/json
   "date_of_birth" : "2002-01-02"
 }
 
-### update_user
+### list_user
 POST http://localhost:8080/list_users
 Content-Type: application/json
 

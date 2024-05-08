@@ -35,7 +35,7 @@ func main() {
 		// words = []string{"aQke1e5VqmrEaFVi14N62WEFkN26jVAZ8gxpr9hq8pY_word"}
 	)
 	req := client.ListSpellingSetsRequest{
-		Tags: []string{"family", "animals"},
+		Tags: "family, animals",
 	}
 	res, err := r.ListSpellingSets(ctx, req)
 	if err != nil {

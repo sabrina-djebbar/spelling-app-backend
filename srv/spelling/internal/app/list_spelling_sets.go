@@ -7,7 +7,7 @@ import (
 )
 
 func (a *app) ListSpellingSets(ctx context.Context, req client.ListSpellingSetsRequest) ([]models.SpellingSet, error) {
-	sets, err := a.repository.ListSetsByTags(ctx, FormatTagsStringToArray(req.Tags))
+	sets, err := a.repository.ListSetsByTags(ctx, req.Tags)
 	if err != nil {
 		return nil, err
 	}
