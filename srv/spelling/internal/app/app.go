@@ -32,3 +32,31 @@ func FormatTagsStringToArray(spelling string) []string {
 	spelling = strings.ReplaceAll(spelling, " ", "")
 	return strings.Split(spelling, ",")
 }
+
+func TransformSpellingExercises(exercises []repo.SpellingExercise) []models.SpellingExercise {
+	spellingExercises := make([]models.SpellingExercise, 0)
+	exerciseMap := make(map[string]int)
+	for _, exercise := range exercises {
+		index, ok := exerciseMap[exercise.ID]
+		if ok {
+			// If exercise ID is found in map, append the attempt to existing SpellingExercise
+			spellingExercises[index].Word = append(spellingExercises[index].Word, exercise.Attempt)
+		} else {
+			// If exercise ID is not found in map, create a new SpellingExercise
+			exerciseMap[exercise.ID] = len(spellingExercises)
+			spellingExercises = append(
+				spellingExercises,
+				models.SpellingExercise{
+					ID:     exercise.ID,
+					UserID: exercise.UserID,
+					Set:    exercise.Set,
+					Word: []models.SpellingAttempt{
+						exercise.Attempt,
+					},
+				},
+			)
+
+		}
+	}
+	return spellingExercises
+}

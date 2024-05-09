@@ -24,17 +24,25 @@ SELECT * FROM spelling_word WHERE tags LIKE  '%' || $1 || '%';
 -- name: AddSpellingAttemptV0 :one
 INSERT INTO spelling_exercise (id, user_id, set_id, word_id,spelling, score, num_of_attempts,last_attempt) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *;
 
--- name: AddSpellingAttempt :one
+-- name: AddSpellingAttempt :many
 WITH se AS (
     INSERT INTO spelling_exercise (id, user_id, set_id, word_id, spelling, score, num_of_attempts, last_attempt)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
 )
-SELECT se.id as exercise_id,se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
-    sw.id AS word_id, sw.spelling as correct_spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
-FROM  se
-         JOIN spelling_word sw ON se.word_id = sw.id
-         JOIN spelling_set ss ON se.set_id = ss.id;
+SELECT se.id as exercise_id, se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
+       sw.id AS word_id, sw.spelling as correct_spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
+FROM se
+         JOIN spelling_word sw ON sw.id = se.word_id
+         JOIN spelling_set ss ON ss.id = se.set_id
+UNION
+SELECT se.id as exercise_id, se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
+       sw.id AS word_id, sw.spelling as correct_spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
+FROM spelling_exercise se
+         JOIN spelling_word sw ON sw.id = se.word_id
+         JOIN spelling_set ss ON ss.id = se.set_id
+WHERE se.id = $1;
+
 
 -- name: GetSpellingExerciseAttemptByID :one
 SELECT se.id as exercise_id,se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,

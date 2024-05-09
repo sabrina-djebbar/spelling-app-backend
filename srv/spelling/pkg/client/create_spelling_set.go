@@ -12,5 +12,5 @@ type CreateSpellingSetRequest struct {
 }
 
 type CreateSpellingSetResponse struct {
-	SpellingSet *models.SpellingSet `json:"spelling_set"`
+	SpellingSet *models.SpellingSet `json:"set"`
 }

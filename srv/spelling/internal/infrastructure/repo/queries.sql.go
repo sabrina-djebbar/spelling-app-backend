@@ -11,17 +11,24 @@ import (
 	"time"
 )
 
-const addSpellingAttempt = `-- name: AddSpellingAttempt :one
+const addSpellingAttempt = `-- name: AddSpellingAttempt :many
 WITH se AS (
     INSERT INTO spelling_exercise (id, user_id, set_id, word_id, spelling, score, num_of_attempts, last_attempt)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING id, user_id, set_id, word_id, spelling, score, num_of_attempts, last_attempt
 )
-SELECT se.id as exercise_id,se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
-    sw.id AS word_id, sw.spelling as correct_spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
-FROM  se
-         JOIN spelling_word sw ON se.word_id = sw.id
-         JOIN spelling_set ss ON se.set_id = ss.id
+SELECT se.id as exercise_id, se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
+       sw.id AS word_id, sw.spelling as correct_spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
+FROM se
+         JOIN spelling_word sw ON sw.id = se.word_id
+         JOIN spelling_set ss ON ss.id = se.set_id
+UNION
+SELECT se.id as exercise_id, se.user_id, se.spelling as spelling_attempt, se.last_attempt, se.num_of_attempts, se.score, ss.id as set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
+       sw.id AS word_id, sw.spelling as correct_spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
+FROM spelling_exercise se
+         JOIN spelling_word sw ON sw.id = se.word_id
+         JOIN spelling_set ss ON ss.id = se.set_id
+WHERE se.id = $1
 `
 
 type AddSpellingAttemptParams struct {
@@ -57,8 +64,8 @@ type AddSpellingAttemptRow struct {
 	WordClass            string
 }
 
-func (q *Queries) AddSpellingAttempt(ctx context.Context, arg AddSpellingAttemptParams) (AddSpellingAttemptRow, error) {
-	row := q.db.QueryRowContext(ctx, addSpellingAttempt,
+func (q *Queries) AddSpellingAttempt(ctx context.Context, arg AddSpellingAttemptParams) ([]AddSpellingAttemptRow, error) {
+	rows, err := q.db.QueryContext(ctx, addSpellingAttempt,
 		arg.ID,
 		arg.UserID,
 		arg.SetID,
@@ -68,29 +75,45 @@ func (q *Queries) AddSpellingAttempt(ctx context.Context, arg AddSpellingAttempt
 		arg.NumOfAttempts,
 		arg.LastAttempt,
 	)
-	var i AddSpellingAttemptRow
-	err := row.Scan(
-		&i.ExerciseID,
-		&i.UserID,
-		&i.SpellingAttempt,
-		&i.LastAttempt,
-		&i.NumOfAttempts,
-		&i.Score,
-		&i.SetID,
-		&i.SetName,
-		&i.Description,
-		&i.RecommendedAge,
-		&i.SetTags,
-		&i.Creator,
-		&i.WordID,
-		&i.CorrectSpelling,
-		&i.Definition,
-		&i.Difficulty,
-		&i.TotalAvailablePoints,
-		&i.WordTags,
-		&i.WordClass,
-	)
-	return i, err
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AddSpellingAttemptRow
+	for rows.Next() {
+		var i AddSpellingAttemptRow
+		if err := rows.Scan(
+			&i.ExerciseID,
+			&i.UserID,
+			&i.SpellingAttempt,
+			&i.LastAttempt,
+			&i.NumOfAttempts,
+			&i.Score,
+			&i.SetID,
+			&i.SetName,
+			&i.Description,
+			&i.RecommendedAge,
+			&i.SetTags,
+			&i.Creator,
+			&i.WordID,
+			&i.CorrectSpelling,
+			&i.Definition,
+			&i.Difficulty,
+			&i.TotalAvailablePoints,
+			&i.WordTags,
+			&i.WordClass,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const addSpellingAttemptV0 = `-- name: AddSpellingAttemptV0 :one

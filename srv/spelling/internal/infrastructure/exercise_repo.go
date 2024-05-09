@@ -11,13 +11,17 @@ import (
 	"time"
 )
 
-func (r *Repository) AddSpellingAttempt(ctx context.Context, params repo.AddSpellingAttemptParams) (*SpellingExercise, error) {
-	attempt, err := r.q.AddSpellingAttempt(ctx, params)
+func (r *Repository) AddSpellingAttempt(ctx context.Context, params repo.AddSpellingAttemptParams) ([]SpellingExercise, error) {
+
+	spellingAttempts := make([]SpellingExercise, 0)
+	attempts, err := r.q.AddSpellingAttempt(ctx, params)
 	if err != nil {
 		return nil, serr.Wrap(err, serr.WithMessage("Unable to create spelling attempt"))
 	}
-
-	return r.transformSpellingAttempt(attempt), nil
+	for _, attempt := range attempts {
+		spellingAttempts = append(spellingAttempts, r.transformSpellingAttempt(attempt))
+	}
+	return spellingAttempts, nil
 
 }
 
@@ -76,8 +80,8 @@ func (r *Repository) transformSpellingExercise(attempt repo.GetSpellingExerciseA
 	}
 }
 
-func (r *Repository) transformSpellingAttempt(attempt repo.AddSpellingAttemptRow) *SpellingExercise {
-	return &SpellingExercise{
+func (r *Repository) transformSpellingAttempt(attempt repo.AddSpellingAttemptRow) SpellingExercise {
+	return SpellingExercise{
 		ID:     attempt.ExerciseID,
 		UserID: attempt.UserID,
 		Set: models.SpellingSet{

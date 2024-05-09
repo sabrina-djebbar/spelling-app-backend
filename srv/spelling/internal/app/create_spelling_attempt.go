@@ -15,7 +15,7 @@ func (a *app) CreateSpellingAttempt(ctx context.Context, req client.CreateSpelli
 		fmt.Println("AttemptID " + req.AttemptID + " will be generated")
 		req.AttemptID = id.Generate("exercise")
 	}
-	attempt, err := a.repository.AddSpellingAttempt(ctx, repo.AddSpellingAttemptParams{ID: req.AttemptID,
+	attempts, err := a.repository.AddSpellingAttempt(ctx, repo.AddSpellingAttemptParams{ID: req.AttemptID,
 		UserID:        req.UserID,
 		SetID:         req.SetID,
 		WordID:        req.WordID,
@@ -27,12 +27,6 @@ func (a *app) CreateSpellingAttempt(ctx context.Context, req client.CreateSpelli
 	if err != nil {
 		return nil, err
 	}
-	return &models.SpellingExercise{
-		ID:     attempt.ID,
-		UserID: attempt.UserID,
-		Set:    attempt.Set,
-		Word: []models.SpellingAttempt{
-			attempt.Attempt,
-		},
-	}, nil
+	exercise := TransformSpellingExercises(attempts)
+	return &exercise[0], nil
 }
