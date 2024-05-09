@@ -3,7 +3,7 @@ POST {{protocol}}user.api.ext.localhost.spelling-app/create_user
 Content-Type: application/json
 
 {
-  "username": "test_user",
+  "username": "test_user_2",
   "password": "password123",
   "parent_code": "1234",
   "date_of_birth": "13-07-2002"
@@ -21,7 +21,7 @@ POST http://localhost:8080/create_user
 Content-Type: application/json
 
 {
-  "username": "test_user",
+  "username": "test_user2",
   "password": "password123",
   "parent_code": "1234",
   "date_of_birth": "2002-01-02T00:00:00Z"
@@ -53,3 +53,11 @@ Content-Type: application/json
   "user_id": "VVllNSUIGg03MrmrDWW52fJszDi9ITS2Ly6uWp5Okdc_user",
   "date_of_birth" : "2002-01-02"
 }
+
+### list_user
+POST http://localhost:8080/list_users
+Content-Type: application/json
+
+{
+}
+

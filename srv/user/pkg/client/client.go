@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"github.com/google/uuid"
 	http "github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/client"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/user/pkg/models"
 )

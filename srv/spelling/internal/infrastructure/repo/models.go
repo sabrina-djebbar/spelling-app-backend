@@ -6,20 +6,42 @@ package repo
 
 import (
 	"database/sql"
-
-	"github.com/google/uuid"
+	"time"
 )
 
-type Credential struct {
-	ID       uuid.UUID
-	UserID   uuid.UUID
-	Password string
+type SpellingExercise struct {
+	ID            string
+	UserID        string
+	SetID         string
+	WordID        string
+	Spelling      string
+	Score         float64
+	NumOfAttempts int32
+	LastAttempt   time.Time
 }
 
-type User struct {
-	ID          uuid.UUID
-	Username    string
-	ParentCode  string
-	DateOfBirth sql.NullTime
-	Created     sql.NullTime
+type SpellingSet struct {
+	ID             string
+	Name           string
+	RecommendedAge string
+	Description    sql.NullString
+	Tags           sql.NullString
+	Creator        string
+	Created        sql.NullTime
+}
+
+type SpellingSetWord struct {
+	SetID  string
+	WordID string
+}
+
+type SpellingWord struct {
+	ID                   string
+	Spelling             string
+	Definition           sql.NullString
+	Class                string
+	Tags                 sql.NullString
+	Difficulty           float64
+	TotalAvailablePoints int32
+	Created              sql.NullTime
 }

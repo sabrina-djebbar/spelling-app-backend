@@ -74,7 +74,7 @@ func (srv *server) RegisterHandler(path string, handler interface{}) {
 
 	srv.router.POST(path,
 		// Perform auth validation before passing to next handler
-		//srv.ValidateAuth(requireAuth),
+		// srv.ValidateAuth(requireAuth),
 		func(ctx *gin.Context) {
 			// Create a new request type and then get the value of it
 			requestPointer := reflect.New(requestType)
@@ -119,10 +119,6 @@ func (srv *server) RegisterHandler(path string, handler interface{}) {
 			reqValueElem := reflect.ValueOf(requestValue).Elem()
 			args[1] = reqValueElem
 
-			// The following calls the handler function using reflection.
-			// This is known to be rather slow so if anyone has any solutions for it
-			// then please come and talk to Jake as I'm stumped on how I can improve performance
-			// without losing the ease of use that this wrapper layer has
 			out := handlerValue.Call(args)
 
 			// Get the response out depending on the number of args

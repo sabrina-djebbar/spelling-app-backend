@@ -34,7 +34,7 @@ services:
     depends_on:
       - postgres
     environment:
-      VIRTUAL_HOST: "user.api.ext.local.spelling-app"
+      VIRTUAL_HOST: "user.api.ext.local.scriteria-app"
       DATABASE_URL: "postgres://postgres:secret@localhost:5432/user?sslmode=disable"
 
 networks:

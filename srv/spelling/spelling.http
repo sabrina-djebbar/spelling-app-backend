@@ -1,0 +1,59 @@
+### create_word
+POST http://localhost:8081/create_spelling_word
+Content-Type: application/json
+
+{
+  "spelling": "mother",
+  "class": "Noun",
+  "tags": "people, relations",
+  "definition": "A female parent."
+}
+
+### login TODO: fix error logging
+POST http://localhost:8081/create_spelling_set
+Content-Type: application/json
+
+{
+  "name": "animals",
+  "description": "10 words relating to different family members",
+  "words": ["KbFyORUpKj48ziQpBsgj1tNzkFsCk6oP8UxGuCuIT6k_word","aQke1e5VqmrEaFVi14N62WEFkN26jVAZ8gxpr9hq8pY_word","COaDsZepgj7TzPB0BpNXmClBIida5ioY5XNxR2XhJbw_word"],
+  "tags": "animals"
+}
+
+### list_spelling_sets
+POST http://localhost:8081/list_spelling_sets
+Content-Type: application/json
+
+{
+  "tags": ["family", "animals"]
+}
+
+### update_user
+POST http://localhost:8081/list_spelling_words
+Content-Type: application/json
+
+{
+  "tags": ["food", "animals"]
+}
+### update_user
+POST http://localhost:8081/list_spelling_exercise_by_user
+Content-Type: application/json
+
+{
+  "user_id": "VVllNSUIGg03MrmrDWW52fJszDi9ITS2Ly6uWp5Okdc_user"
+}
+
+### create_spelling_attempt
+POST http://localhost:8081/create_spelling_attempt
+Content-Type: application/json
+
+{
+  "attempt_id": "Cqa78R_bXCo8UJAke7rTFaGoOn8dJ3JrZ7VrjVJkxWQ_exercise",
+  "user_id": "VVllNSUIGg03MrmrDWW52fJszDi9ITS2Ly6uWp5Okdc_user",
+  "set_id": "8UbqpeH79u2rrMO8T7s9OVvAZVxj3glgmzVT4I7hv5w_set",
+  "word_id": "KbFyORUpKj48ziQpBsgj1tNzkFsCk6oP8UxGuCuIT6k_word",
+  "spelling": "father",
+  "score": 7,
+  "num_of_attempts": 1,
+  "last_attempt": "2024-04-30T12:00:00Z"
+}

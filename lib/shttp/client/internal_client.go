@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/middleware"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp/middleware"
 )
 
 var (
