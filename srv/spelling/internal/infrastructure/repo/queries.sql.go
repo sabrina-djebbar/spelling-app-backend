@@ -398,6 +398,65 @@ func (q *Queries) GetWordDifficulty(ctx context.Context, id string) (float64, er
 	return difficulty, err
 }
 
+const listSets = `-- name: ListSets :many
+SELECT  ss.id AS set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
+        sw.id AS word_id, sw.spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class
+FROM spelling_set ss JOIN spelling_set_words ssw ON ss.id = ssw.set_id JOIN spelling_word sw ON ssw.word_id = sw.id
+`
+
+type ListSetsRow struct {
+	SetID                string
+	SetName              string
+	Description          sql.NullString
+	RecommendedAge       string
+	SetTags              sql.NullString
+	Creator              string
+	WordID               string
+	Spelling             string
+	Definition           sql.NullString
+	Difficulty           float64
+	TotalAvailablePoints int32
+	WordTags             sql.NullString
+	WordClass            string
+}
+
+func (q *Queries) ListSets(ctx context.Context) ([]ListSetsRow, error) {
+	rows, err := q.db.QueryContext(ctx, listSets)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSetsRow
+	for rows.Next() {
+		var i ListSetsRow
+		if err := rows.Scan(
+			&i.SetID,
+			&i.SetName,
+			&i.Description,
+			&i.RecommendedAge,
+			&i.SetTags,
+			&i.Creator,
+			&i.WordID,
+			&i.Spelling,
+			&i.Definition,
+			&i.Difficulty,
+			&i.TotalAvailablePoints,
+			&i.WordTags,
+			&i.WordClass,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listSetsByTags = `-- name: ListSetsByTags :many
 SELECT  ss.id AS set_id, ss.name AS set_name, ss.description, ss.recommended_age, ss.tags as set_tags,ss.creator,
         sw.id AS word_id, sw.spelling, sw.definition, sw.difficulty, sw.total_available_points, sw.tags as word_tags, sw.class as word_class

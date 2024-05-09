@@ -147,7 +147,39 @@ func (r *Repository) ListSetsByTags(ctx context.Context, tags []string) ([]ListS
 	}
 	return spellingSets, nil
 }
+func (r *Repository) ListSets(ctx context.Context) ([]ListSetsByTagRes, error) {
+	spellingSets := make([]ListSetsByTagRes, 0)
 
+	sets, err := r.q.ListSets(ctx)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, serr.Wrap(err, serr.WithMessage("No sets"))
+		}
+		return nil, serr.Wrap(err, serr.WithMessage("Unable to list sets"))
+	}
+	for _, set := range sets {
+		spellingSets = append(spellingSets, ListSetsByTagRes{
+			ID:             set.SetID,
+			Name:           set.SetName,
+			RecommendedAge: set.RecommendedAge,
+			Description:    database.SQLNullStringToString(set.Description),
+			Tags:           database.SQLNullStringToString(set.SetTags),
+			Creator:        set.Creator,
+			Word: models.SpellingWord{
+				ID:                   set.WordID,
+				Spelling:             set.Spelling,
+				Definition:           database.SQLNullStringToString(set.Definition),
+				Class:                models.Class(set.WordClass),
+				Difficulty:           set.Difficulty,
+				TotalAvailablePoints: database.Int32ToInt(set.TotalAvailablePoints),
+				Tags:                 FormatNullStringTags(set.WordTags),
+			},
+		})
+
+	}
+
+	return spellingSets, nil
+}
 func FormatTagsStringToArray(spelling string) []string {
 	spelling = strings.ReplaceAll(spelling, " ", "")
 	return strings.Split(spelling, ",")

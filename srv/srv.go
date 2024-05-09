@@ -1,3 +1,3 @@
 package srv
 
-var All = []string{"user"}
+var All = []string{"user", "spelling"}

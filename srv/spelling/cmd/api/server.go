@@ -1,6 +1,8 @@
 package api
 
 import (
+	"log"
+
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/database"
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/shttp"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/internal/app"
@@ -9,7 +11,6 @@ import (
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/internal/rpc"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/client"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 var CMD = &cobra.Command{
@@ -34,10 +35,12 @@ func runE(cmd *cobra.Command, _ []string) error {
 	)
 
 	router := shttp.New(cmd)
+
 	router.RegisterHandler(client.CreateSpellingWordPath, r.CreateSpellingWord)
 	router.RegisterHandler(client.CreateSpellingSetPath, r.CreateSpellingSet)
 	router.RegisterHandler(client.ListSpellingSetsPath, r.ListSpellingSets)
 	router.RegisterHandler(client.CreateSpellingAttemptPath, r.CreateSpellingAttempt)
 	router.RegisterHandler(client.ListSpellingExerciseByUserPath, r.ListSpellingExerciseByUser)
+
 	return router.Listen("8081")
 }

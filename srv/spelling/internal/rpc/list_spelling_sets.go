@@ -10,5 +10,5 @@ func (r rpc) ListSpellingSets(ctx context.Context, req client.ListSpellingSetsRe
 	if err != nil {
 		return nil, err
 	}
-	return &client.ListSpellingSetResponse{sets}, nil
+	return &client.ListSpellingSetResponse{Sets: sets}, nil
 }

@@ -2,12 +2,23 @@ package app
 
 import (
 	"context"
+	repo "github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/internal/infrastructure"
+
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/client"
 	"github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/pkg/models"
 )
 
 func (a *app) ListSpellingSets(ctx context.Context, req client.ListSpellingSetsRequest) ([]models.SpellingSet, error) {
-	sets, err := a.repository.ListSetsByTags(ctx, req.Tags)
+	var sets []repo.ListSetsByTagRes
+	var err error
+
+	if len(req.Tags) == 0 {
+		sets, err = a.repository.ListSets(ctx)
+
+	} else {
+		sets, err = a.repository.ListSetsByTags(ctx, req.Tags)
+	}
+
 	if err != nil {
 		return nil, err
 	}

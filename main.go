@@ -1,13 +1,14 @@
 package main
 
 import (
+	"log"
+	"math/rand"
+	"time"
+
 	"github.com/sabrina-djebbar/spelling-app-backend/lib/killable"
 	spelling "github.com/sabrina-djebbar/spelling-app-backend/srv/spelling/cmd"
 	user "github.com/sabrina-djebbar/spelling-app-backend/srv/user/cmd"
 	"github.com/spf13/cobra"
-	"log"
-	"math/rand"
-	"time"
 )
 
 var l = &log.Logger{}
@@ -45,6 +46,5 @@ func main() {
 		l.Fatal("an error occurred executing that command", "err_message", err.Error(), "err", err)
 		return
 	}
-	//spelling.Main(l)
 
 }
